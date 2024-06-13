@@ -70,7 +70,7 @@ jobs:
 
       - name: Generate wrangler.toml for main worker
         run: |
-          echo "name = \"oaifreehelper\"" > wrangler.toml
+          echo "name = \"chatgpt\"" > wrangler.toml
           echo "workers_dev = true" >> wrangler.toml
           echo "main = \"_worker.js\"" >> wrangler.toml
           echo "compatibility_date = \"2024-06-01\"" >> wrangler.toml
