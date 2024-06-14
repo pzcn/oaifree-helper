@@ -2209,9 +2209,10 @@ async function getRegisterHTML() {
                       const continueBtn = document.getElementById('continueBtn');
                       const manageAccountForm = document.getElementById('manageAccountForm0');
           
-                      continueBtn.addEventListener('click', function() {
-                          if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'none') {
-                              usernameWrapper.style.display = 'block';
+                    continueBtn.addEventListener('click', function() {
+                      if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'none') {
+                          usernameWrapper.style.display = 'block';
+                          passwordWrapper.style.display = 'block';
                           } else if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'block') {
                               const usernameInput = document.getElementById('username');
                               if (usernameInput.value.trim() && document.getElementById('cf-turnstile-response').value) {
