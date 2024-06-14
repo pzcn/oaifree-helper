@@ -2923,9 +2923,10 @@ if ((GPTState == 'major_performance')&&(!status)){
   // 获取用户输入的密码
   const password = formData.get('password');
 
+  // --- 将密码验证代码块移到登录流程外部 ---
   // 验证密码
   if (users[userName] && await hashPassword(password) === users[userName]) {
-    // 密码验证成功，继续登录流程
+    // 密码验证成功
 
     const userRegex = new RegExp(`^${userName}_(\\d+)$`);
     let fullUserName = userName;
@@ -3041,7 +3042,7 @@ accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype
           await KV.put(accessTokenKey, newAccessToken);
         } else {
           await KV.put(accessTokenKey, "Bad_RT");
-         await loginlog(fullUserName, `Bad RT_${accountNumber}`,'Error');
+          await loginlog(fullUserName, `Bad RT_${accountNumber}`, 'Error');
           return generateLoginResponse('Error fetching access token.');
         }
  } 
