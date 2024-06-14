@@ -2882,21 +2882,7 @@ if ((GPTState == 'major_performance')&&(!status)){
     return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
   }
 
- //先尝试json
-  try {
-    const tokenData = JSON.parse(userName);
-    if (tokenData.accessToken) {
-      const jsonAccessToken = tokenData.accessToken;
-      const shareToken = await getShareToken('atdirect', jsonAccessToken, '0');
-      if (shareToken === 'Can not get share token.') {
-        return generateLoginResponse('Error fetching share token.');
-      }
-   
-      return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
-    }
-  } catch (e) {
-    // 输入不是 JSON 格式
-  }
+  // --- 移除错误的 JSON 解析逻辑 ---
 
 // 如果输入用户名长度大于50，直接视作accessToken
   if (userName.length > 50) {
@@ -2923,53 +2909,11 @@ if ((GPTState == 'major_performance')&&(!status)){
   // 获取用户输入的密码
   const password = formData.get('password');
 
-  // --- 将密码验证代码块移到登录流程外部 ---
   // 验证密码
   if (users[userName] && await hashPassword(password) === users[userName]) {
     // 密码验证成功
 
-    const userRegex = new RegExp(`^${userName}_(\\d+)$`);
-    let fullUserName = userName;
-    let foundSuffix = false;
-    let suffix = '';
-    const forcean = await KV.get("ForceAN");
-  const defaultusers = await KV.get("Users")|| '';
-  const vipusers = await KV.get("VIPUsers")|| '';
-  const freeusers = await KV.get("FreeUsers")|| '';
-  const admin = await KV.get("Admin")|| '';
-    // 合并所有用户
-    const users = `${defaultusers},${vipusers},${freeusers},${admin}`;
-
-
- // 自动查找匹配的用户名格式abc_xxx，并添加后缀
-    users.split(",").forEach(user => {
-      const match = user.match(userRegex);
-      if (match) {
-        foundSuffix = true;
-           suffix = match[1];  // 更新后缀为实际的账号编号
-        fullUserName = user; // 更新为完整的用户名
-      }
-    });
-
-    if (!foundSuffix && !users.split(",").includes(userName)) {
-   await loginlog(userName, 'Bad_PW','Error');
-      return generateLoginResponse('Unauthorized access.');
-    }
-
-  
- //用户权限判断，仅在users库内的用户可使用所有车(前置已判断，不过也不用删)
- if (!users.split(",").includes(fullUserName)) {
-     await loginlog(userName, 'Bad_PW','Error');
-     return generateLoginResponse('Unauthorized access.');
- }
- //禁止免费用户使用序号大于99的vip私享车
-// if (freeusers.split(",").includes(fullUserName) && accountNumber > 99) {
-//     return new Response('Unauthorized access, you are vip users.', { status: 200 });
-// }
- //禁止付费用户使用序号小于99的免费车
- //if (vipusers.split(",").includes(fullUserName) && accountNumber < 100) {
- //    return new Response('Unauthorized access, please switch accounts.', { status: 200 });
- //}
+}
 
 
  //此处决定an
