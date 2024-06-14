@@ -150,7 +150,7 @@ if (cookies) {
   
   //处理直链登陆形式
   const params = new URLSearchParams(url.search);
-  const userName = params.get('un');
+  const userName = params.get('user');
   if (userName) {
       const accountNumber = params.get('an-custom') || params.get('an') || '1';
       return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
@@ -1363,7 +1363,7 @@ async function handleUserPostRequest(request) {
   const freeUsers = await KV.get('FreeUsers') || '';
   const vipUsers = await KV.get('VIPUsers') || '';
   const WorkerURL=await KV.get('WorkerURL');
-  return generateUserResponse(`User Added successfully\n\nLogin link:\nhttps://${WorkerURL}/?un=${newUsers}\n\nusers:\n${users}\n\nfreeusers:\n${freeUsers}\n\nvipusers:\n${vipUsers}`);
+  return generateUserResponse(`User Added successfully\n\nLogin link:\nhttps://${WorkerURL}/?user=${newUsers}\n\nusers:\n${users}\n\nfreeusers:\n${freeUsers}\n\nvipusers:\n${vipUsers}`);
   }
 }
 
