@@ -1674,45 +1674,40 @@ if ('${removeTurnstile}') {
 
 //Register功能
 async function handleRegisterPostRequest(request) {
-  const formData = await request.formData();
-  const cdkey = formData.get('cdkey');
-  const username = formData.get('username');
-  const password = formData.get('password'); // 获取密码
-  const turnstileResponse = formData.get('cf-turnstile-response');
+  const formData = await request.formData()
+  const cdkey = formData.get('cdkey')
+  const username = formData.get('username')
+  const turnstileResponse = formData.get('cf-turnstile-response')
 
   if (!await verifyTurnstile(turnstileResponse)) {
-    return generateRegisterResponse('Turnstile verification failed');
+    return generateRegisterResponse('Turnstile verification failed')
   }
 
-  const autoDeleteCDK = await KV.get('AutoDeleteCDK');
+  const autoDeleteCDK = await KV.get('AutoDeleteCDK')
   const cdkeyStore = await KV.get('CDKEY') || '';
-  const cdkeyList = cdkeyStore ? cdkeyStore.split(',') : [];
+  const cdkeyList = cdkeyStore ? cdkeyStore.split(',') : []
 
   if (!cdkeyList.includes(cdkey)) {
-    return generateRegisterResponse('Invalid CDKEY');
+    return generateRegisterResponse('Invalid CDKEY')
   }
   await registerlog(username, cdkey);
-  if (autoDeleteCDK) {
-    // Remove used CDKEY and update store
-    const updatedCdkeyList = cdkeyList.filter(key => key !== cdkey);
-    await KV.put('CDKEY', updatedCdkeyList.join(','));
+  if (autoDeleteCDK){
+  // Remove used CDKEY and update store
+  const updatedCdkeyList = cdkeyList.filter(key => key !== cdkey)
+  await KV.put('CDKEY', updatedCdkeyList.join(','))
   }
 
   // Add new user to freeusers
-  const freeUsers = await KV.get('FreeUsers');
-  const freeUsersList = freeUsers ? freeUsers.split(',') : [];
+  const freeUsers = await KV.get('FreeUsers')
+  const freeUsersList = freeUsers ? freeUsers.split(',') : []
   if (freeUsersList.includes(username)) {
-    return generateRegisterResponse('Username already exist.');
+    return generateRegisterResponse('Username already exist.')
   }
-  freeUsersList.push(username);
-  await KV.put('FreeUsers', freeUsersList.join(','));
+    freeUsersList.push(username)
+    await KV.put('FreeUsers', freeUsersList.join(','))
+  
 
-  // 存储用户名和哈希密码
-  const hashedPassword = generatePassword(username + password);
-  await KV.put(`user_${username}`, username);
-  await KV.put(`password_${username}`, hashedPassword);
-
-  return generateRegisterResponse('Registration successful');
+  return generateRegisterResponse('Registration successful')
 }
 
 async function registerlog(userName, cdkey) {
@@ -2168,22 +2163,7 @@ async function getRegisterHTML() {
                                           required
                                       />
                                       <label class="email-label" for="username">Your Username</label>
-                                        </div>
-                                        <div class="input-wrapper" id="passwordWrapper" style="display: none;">
-                                        <input
-                                            class="email-input"
-                                            inputmode="password"
-                                            type="password"
-                                            id="password"
-                                            name="password"
-                                            autocomplete="new-password"
-                                            autocapitalize="none"
-                                            spellcheck="false"
-                                            placeholder=" "
-                                            required
-                                        />
-                                        <label class="email-label" for="password">Your Password</label>
-                                        </div>
+                                    </div>
                                       <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
                                       <button class="continue-btn" type="button" id="continueBtn">Continue</button>
                                       <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
@@ -2209,10 +2189,9 @@ async function getRegisterHTML() {
                       const continueBtn = document.getElementById('continueBtn');
                       const manageAccountForm = document.getElementById('manageAccountForm0');
           
-                    continueBtn.addEventListener('click', function() {
-                      if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'none') {
-                          usernameWrapper.style.display = 'block';
-                          passwordWrapper.style.display = 'block';
+                      continueBtn.addEventListener('click', function() {
+                          if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'none') {
+                              usernameWrapper.style.display = 'block';
                           } else if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'block') {
                               const usernameInput = document.getElementById('username');
                               if (usernameInput.value.trim() && document.getElementById('cf-turnstile-response').value) {
@@ -2849,101 +2828,76 @@ async function getShareToken(userName, accessToken,accountNumber) {
 }
 
 
-async function handleLogin(userName, initialaccountNumber, turnstileResponse, anissues) {
-  // Turnsile 认证
-  if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
-    return generateLoginResponse('Turnstile verification failed');
-  }
+async function handleLogin(userName, initialaccountNumber, turnstileResponse,anissues) {
+//Turnsile认证
+if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
+   return generateLoginResponse('Turnstile verification failed');
+}
+const proxiedDomain = await KV.get('WorkerURL');
+const status = await KV.get('Status');
+const GPTState = await getGPTStatus();
+if ((GPTState == 'major_performance')&&(!status)){
+  await loginlog(userName, 'Bad_OAIStatus','Error');
+  return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
+}
 
-  const proxiedDomain = await KV.get('WorkerURL');
-  const status = await KV.get('Status');
-  const GPTState = await getGPTStatus();
-  if ((GPTState == 'major_performance') && (!status)) {
-    await loginlog(userName, 'Bad_OAIStatus', 'Error');
-    return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
-  }
-
-  // 先尝试 JSON
-  try {
-    const tokenData = JSON.parse(userName);
-    if (tokenData.accessToken) {
+ //先尝试json
+ try {
+     const tokenData = JSON.parse(userName);
+     if (tokenData.accessToken) {
       const jsonAccessToken = tokenData.accessToken;
       const shareToken = await getShareToken('atdirect', jsonAccessToken, '0');
       if (shareToken === 'Can not get share token.') {
-        return generateLoginResponse('Error fetching share token.');
-      }
-
-      return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+       return generateLoginResponse('Error fetching share token.');
+     }
+   
+     return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
     }
-  } catch (e) {
-    // 输入不是 JSON 格式
-  }
+   } catch (e) {
+     // 输入不是 JSON 格式
+   }
 
-  // 如果输入用户名长度大于 50，直接视作 accessToken
-  if (userName.length > 50) {
-    const shareToken = await getShareToken('atdirect', userName, '0');
+// 如果输入用户名长度大于50，直接视作accessToken
+if (userName.length > 50) {
+ const shareToken = await getShareToken('atdirect', userName, '0');
 
-    if (shareToken === 'Can not get share token.') {
-      return generateLoginResponse('Error fetching share token.');
-    }
+ if (shareToken === 'Can not get share token.') {
+   return generateLoginResponse('Error fetching share token.');
+ }
 
-    return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
-  }
+ return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+}
 
-  // 如果输入用户名 fk 开头，直接视作 sharetoken
-  if (userName.startsWith('fk-')) {
-    const shareToken = userName;
-    return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
-  }
 
-  const formData = await request.formData();
-  const password = formData.get('pw'); // 获取密码
+// 如果输入用户名fk开头，直接视作sharetoken
+if (userName.startsWith('fk-')) {
+ const shareToken = userName;
+ return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+}
 
-  // 从 KV 数据库中读取用户名
-  let fullUserName = await KV.get(`user_${userName}`);
-
-  // 如果用户名不存在，则返回错误
-  if (!fullUserName) {
-    await loginlog(userName, 'Bad_PW', 'Error');
-    return generateLoginResponse('Invalid username or password.');
-  }
-
-  // 获取存储的哈希密码
-  const storedHashedPassword = await KV.get(`password_${fullUserName}`);
-
-  // 验证密码
-  if (!storedHashedPassword || generatePassword(userName + password) !== storedHashedPassword) {
-    await loginlog(userName, 'Bad_PW', 'Error');
-    return generateLoginResponse('Invalid username or password.');
-  }
-
-  // 用户名和密码验证成功后，才执行以下代码
-  const refreshTokenKey = `rt_${accountNumber}`;
-  const accessTokenKey = `at_${accountNumber}`;
-  const accessToken = await KV.get(accessTokenKey);
-
-  const userRegex = new RegExp(`^${userName}_(\\d+)$`);
-  let foundSuffix = false;
-  let suffix = '';
-  const forcean = await KV.get("ForceAN");
-  const defaultusers = await KV.get("Users") || '';
-  const vipusers = await KV.get("VIPUsers") || '';
-  const freeusers = await KV.get("FreeUsers") || '';
-  const admin = await KV.get("Admin") || '';
-
+ const userRegex = new RegExp(`^${userName}_(\\d+)$`);
+ let fullUserName = userName;
+ let foundSuffix = false;
+ let suffix = '';
+ const forcean = await KV.get("ForceAN");
+  const defaultusers = await KV.get("Users")|| '';
+  const vipusers = await KV.get("VIPUsers")|| '';
+  const freeusers = await KV.get("FreeUsers")|| '';
+  const admin = await KV.get("Admin")|| '';
   // 合并所有用户
   const users = `${defaultusers},${vipusers},${freeusers},${admin}`;
 
-  // 自动查找匹配的用户名格式 abc_xxx，并添加后缀
-  users.split(",").forEach(user => {
-    const match = user.match(userRegex);
-    if (match) {
-      foundSuffix = true;
-      suffix = match[1]; // 更新后缀为实际的账号编号
-      fullUserName = user; // 更新为完整的用户名
-    }
-  });
 
+ // 自动查找匹配的用户名格式abc_xxx，并添加后缀
+ users.split(",").forEach(user => {
+   const match = user.match(userRegex);
+       if (match) {
+           foundSuffix = true;
+           suffix = match[1];  // 更新后缀为实际的账号编号
+           fullUserName = user; // 更新为完整的用户名
+       }
+   });
+    
 if (!foundSuffix && !users.split(",").includes(userName)) {
    await loginlog(userName, 'Bad_PW','Error');
    return generateLoginResponse('Unauthorized access.');
@@ -2971,97 +2925,103 @@ if (!foundSuffix && !users.split(",").includes(userName)) {
   let mode = '';
   let accountNumber = '';
 
-  // 如果 forcean 为 1，忽略用户输入的 accountNumber，使用后缀作为 accountNumber
-  if (foundSuffix && forcean === '1') {
-    accountNumber = await getAccountNumber(fullUserName, suffix, antype, 'Check', anissues);
-  } else {
-    if (setan == 'True') {
-      const plusmode = await KV.get('PlusMode'); // Random/Order
-      const freemode = await KV.get('FreeMode'); // Plus/Random/Order
-      antype = 'Plus';
-      mode = plusmode;
-      if (freemode !== 'Plus') {
-        if (freeusers.split(",").includes(fullUserName)) {
-          antype = 'Free';
-          mode = freemode;
-        }
-      }
+   // 如果 forcean 为 1，忽略用户输入的 accountNumber，使用后缀作为 accountNumber
+if (foundSuffix && forcean === '1') {
+ accountNumber = await getAccountNumber(fullUserName,suffix, antype, 'Check',anissues);
+} else {
+if (setan == 'True') {
+  const plusmode = await KV.get('PlusMode'); //Random/Order
+  const freemode = await KV.get('FreeMode'); //Plus/Random/Order
+     antype = 'Plus';
+     mode = plusmode;
+ if (freemode !=='Plus'){
+    if (freeusers.split(",").includes(fullUserName) ){
+     antype = 'Free';
+     mode = freemode;
+     }
+ }
+ 
+accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, mode,anissues);
+}
+else if (setan)  {
+ accountNumber = await getAccountNumber(fullUserName,setan, antype, 'Check',anissues);
+}
+else {
+accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, 'Check',anissues);
+}
+}
 
-      accountNumber = await getAccountNumber(fullUserName, initialaccountNumber, antype, mode, anissues);
-    } else if (setan) {
-      accountNumber = await getAccountNumber(fullUserName, setan, antype, 'Check', anissues);
-    } else {
-      accountNumber = await getAccountNumber(fullUserName, initialaccountNumber, antype, 'Check', anissues);
-    }
-  }
 
-  const refreshTokenKey = `rt_${accountNumber}`;
-  const accessTokenKey = `at_${accountNumber}`;
-  const accessToken = await KV.get(accessTokenKey);
+ const refreshTokenKey = `rt_${accountNumber}`;
+ const accessTokenKey = `at_${accountNumber}`;
+ const accessToken = await KV.get(accessTokenKey);
 
-  // 使用佬友的 sharetoken
-  if (accessToken) {
-    if (accessToken.startsWith('fk-')) {
-      const fkDomain = await KV.get('FKDomain') || proxiedDomain;
-      //return Response.redirect(await getOAuthLink(accessToken, fkDomain), 302);
-      return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`);
-    }
-  }
+ //使用佬友的sharetoken
+ if (accessToken){
+ if (accessToken.startsWith('fk-')) {
+   const fkDomain = await KV.get('FKDomain') ||proxiedDomain;
+   //return Response.redirect(await getOAuthLink(accessToken, fkDomain), 302);
+   return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`)
+ }}
+ 
+ if (isTokenExpired(accessToken)) {
+      // 给没有refresh token的萌新用（比如我），取消下面这行注释即可享用
+     // return generateLoginResponse('The current access token has not been updated.', false);
+      
+      // 如果 Token 过期，执行获取新 Token 的逻辑
+      const url = 'https://token.oaifree.com/api/auth/refresh';
+     const refreshToken = await KV.get(refreshTokenKey);
+     if (refreshToken) {
 
-  if (isTokenExpired(accessToken)) {
-    // 给没有 refresh token 的萌新用（比如我），取消下面这行注释即可享用
-    // return generateLoginResponse('The current access token has not been updated.', false);
-
-    // 如果 Token 过期，执行获取新 Token 的逻辑
-    const url = 'https://token.oaifree.com/api/auth/refresh';
-    const refreshToken = await KV.get(refreshTokenKey);
-    if (refreshToken) {
       // 发送 POST 请求
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-        },
-        body: `refresh_token=${refreshToken}`
-      });
+     const response = await fetch(url, {
+         method: 'POST',
+         headers: {
+             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+         },
+         body: `refresh_token=${refreshToken}`
+     });
+    
+     // 检查响应状态
+     if (response.ok) {
+         const data = await response.json();
+         const newAccessToken = data.access_token;
+         await KV.put(accessTokenKey, newAccessToken);
+     } else {
+         await KV.put(accessTokenKey, "Bad_RT");
+         await loginlog(fullUserName, `Bad RT_${accountNumber}`,'Error');
+         return generateLoginResponse('Error fetching access token.');
+     }
+ } 
+ else {
+   return generateLoginResponse('The current access token has not been updated.');
+ }
+ }   
+     const finalaccessToken = await KV.get(accessTokenKey);
+ const shareToken = await getShareToken(fullUserName, finalaccessToken,accountNumber);
 
-      // 检查响应状态
-      if (response.ok) {
-        const data = await response.json();
-        const newAccessToken = data.access_token;
-        await KV.put(accessTokenKey, newAccessToken);
-      } else {
-        await KV.put(accessTokenKey, "Bad_RT");
-        await loginlog(fullUserName, `Bad RT_${accountNumber}`, 'Error');
-        return generateLoginResponse('Error fetching access token.');
-      }
-    } else {
-      return generateLoginResponse('The current access token has not been updated.');
-    }
-  }
-  const finalaccessToken = await KV.get(accessTokenKey);
-  const shareToken = await getShareToken(fullUserName, finalaccessToken, accountNumber);
+ 
+ if (shareToken === 'Can not get share token.') {
+     //await KV.put(accessTokenKey, "Bad_AT");
+     await loginlog(fullUserName, `Bad AT_${accountNumber}`,'Error');
+     return generateLoginResponse('Error fetching share token.');
+ }
 
-  if (shareToken === 'Can not get share token.') {
-    //await KV.put(accessTokenKey, "Bad_AT");
-    await loginlog(fullUserName, `Bad AT_${accountNumber}`, 'Error');
-    return generateLoginResponse('Error fetching share token.');
-  }
-
+ 
   // Log the successful login
   await loginlog(fullUserName, accountNumber, antype);
 
   const oauthLink = await getOAuthLink(shareToken, proxiedDomain);
-  const headers = new Headers();
-  headers.append('Location', oauthLink);
-  headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
-
-
-  const response = new Response(null, {
-    status: 302,
-    headers: headers
-  });
-  return response;
+       const headers = new Headers();
+     headers.append('Location', oauthLink);
+     headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
+     
+     
+       const response = new Response(null, {
+           status: 302,
+           headers: headers
+       });
+       return response;
 }
 
 async function loginlog(userName, accountNumber, antype) {
@@ -3673,36 +3633,21 @@ async function getLoginHTML(setan) {
                          <div class="title-wrapper"><h1 class="title">${websiteName}</h1></div>
                          <div class="login-container">
                              <form id="manageAccountForm0" action="/auth/login_auth0" method="POST">
-                                <div class="input-wrapper">
-                                    <input
-                                        class="email-input"
-                                        inputmode="email"
-                                        type="text"
-                                        id="un"
-                                        name="un"
-                                        autocomplete="username"
-                                        autocapitalize="none"
-                                        spellcheck="false"
-                                        required
-                                        placeholder=" "
-                                    />
-                                    <label class="email-label" for="un">Username</label>
-                                </div>
-                                <div class="input-wrapper">
-                                    <input
-                                        class="email-input"
-                                        inputmode="password"
-                                        type="password"
-                                        id="pw"
-                                        name="pw"
-                                        autocomplete="current-password"
-                                        autocapitalize="none"
-                                        spellcheck="false"
-                                        required
-                                        placeholder=" "
-                                    />
-                                    <label class="email-label" for="pw">Password</label>
-                                </div>`;
+                                 <div class="input-wrapper">
+                                     <input
+                                         class="email-input"
+                                         inputmode="email"
+                                         type="text"
+                                         id="un"
+                                         name="un"
+                                         autocomplete="username"
+                                         autocapitalize="none"
+                                         spellcheck="false"
+                                         required
+                                         placeholder=" "
+                                     />
+                                     <label class="email-label" for="un">Username</label>
+                                 </div>`;
  
    const aliveAccountOptions = await getAliveAccountOptions();
  
