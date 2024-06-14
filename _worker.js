@@ -1717,17 +1717,17 @@ async function handleRegisterPostRequest(request) {
   // 加密密码
   const hashedPassword = await hashPassword(password);
 
-  // 将用户名和加密后的密码添加到用户数据中
-  users[username] = hashedPassword;
+// 将用户名和加密后的密码添加到用户数据中
+users[username] = hashedPassword;
 
-  // 存储更新后的用户数据
-  await KV.put('users', JSON.stringify(password));
+// 存储更新后的用户数据
+await KV.put('users', JSON.stringify(users));
 
-  // Add new user to freeusers
-  const freeUsers = await KV.get('FreeUsers');
-  const freeUsersList = freeUsers ? freeUsers.split(',') : [];
-  freeUsersList.push(username);
-  await KV.put('FreeUsers', freeUsersList.join(','));
+// Add new user to freeusers
+const freeUsers = await KV.get('FreeUsers');
+const freeUsersList = freeUsers ? freeUsers.split(',') : [];
+freeUsersList.push(username);
+await KV.put('FreeUsers', freeUsersList.join(','));
 
   return generateRegisterResponse('Registration successful');
 }
