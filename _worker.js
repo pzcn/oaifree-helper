@@ -2775,16 +2775,15 @@ async function handleLoginGetRequest(request) {
 }
 
 
-async function handleLoginPostRequest(request) {
-  const formData = await request.formData();
-  const userName = formData.get('un');
-  const anissues = formData.get('anissues') === 'on';
-  const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
-  const turnstileResponse = formData.get('cf-turnstile-response');
+  async function handleLoginPostRequest(request) {
+    const formData = await request.formData();
+    const userName = formData.get('un');
+    const anissues = formData.get('anissues') === 'on';
+    const accountNumber =formData.get('an-custom') || formData.get('an') || '1';
 
-  // 将 request 变量传递给 handleLogin 函数
-  return await handleLogin(userName, accountNumber, turnstileResponse, anissues, request); 
-}
+    const turnstileResponse = formData.get('cf-turnstile-response');
+    return await handleLogin(userName, accountNumber, turnstileResponse,anissues);
+  }
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
   if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
@@ -2917,6 +2916,11 @@ async function handleLogin(userName, initialaccountNumber, turnstileResponse, an
     await loginlog(userName, 'Bad_PW', 'Error');
     return generateLoginResponse('Invalid username or password.');
   }
+
+  // 用户名和密码验证成功后，才执行以下代码
+  const refreshTokenKey = `rt_${accountNumber}`;
+  const accessTokenKey = `at_${accountNumber}`;
+  const accessToken = await KV.get(accessTokenKey);
 
   const userRegex = new RegExp(`^${userName}_(\\d+)$`);
   let foundSuffix = false;
