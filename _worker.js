@@ -2869,34 +2869,46 @@ async function getShareToken(userName, accessToken,accountNumber) {
 }
 
 
-async function handleLogin(userName, initialaccountNumber, turnstileResponse,anissues) {
-//Turnsile认证
+async function handleLogin(userName, initialaccountNumber, turnstileResponse, anissues) {
+  // Turnstile 认证
   if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
     return generateLoginResponse('Turnstile verification failed');
   }
+
   const proxiedDomain = await KV.get('WorkerURL');
   const status = await KV.get('Status');
   const GPTState = await getGPTStatus();
-if ((GPTState == 'major_performance')&&(!status)){
-  await loginlog(userName, 'Bad_OAIStatus','Error');
+
+  if ((GPTState == 'major_performance') && (!status)) {
+    await loginlog(userName, 'Bad_OAIStatus', 'Error');
     return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
   }
 
-  // --- 移除错误的 JSON 解析逻辑 ---
+  // 先尝试 JSON 格式的 accessToken
+  try {
+    const tokenData = JSON.parse(userName);
+    if (tokenData.accessToken) {
+      const jsonAccessToken = tokenData.accessToken;
+      const shareToken = await getShareToken('atdirect', jsonAccessToken, '0');
+      if (shareToken === 'Can not get share token.') {
+        return generateLoginResponse('Error fetching share token.');
+      }
+      return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+    }
+  } catch (e) {
+    // 输入不是 JSON 格式
+  }
 
-// 如果输入用户名长度大于50，直接视作accessToken
+  // 如果输入用户名长度大于 50，直接视作 accessToken
   if (userName.length > 50) {
     const shareToken = await getShareToken('atdirect', userName, '0');
-
     if (shareToken === 'Can not get share token.') {
       return generateLoginResponse('Error fetching share token.');
     }
-
     return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
   }
 
-
-// 如果输入用户名fk开头，直接视作sharetoken
+  // 如果输入用户名 fk 开头，直接视作 sharetoken
   if (userName.startsWith('fk-')) {
     const shareToken = userName;
     return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
@@ -2911,12 +2923,37 @@ if ((GPTState == 'major_performance')&&(!status)){
 
   // 验证密码
   if (users[userName] && await hashPassword(password) === users[userName]) {
-    // 密码验证成功
+    // --- 密码验证成功，执行登录流程 ---
 
-}
+    const userRegex = new RegExp(`^${userName}_(\\d+)$`);
+    let fullUserName = userName;
+    let foundSuffix = false;
+    let suffix = '';
+    const forcean = await KV.get("ForceAN");
+    const defaultusers = await KV.get("Users") || '';
+    const vipusers = await KV.get("VIPUsers") || '';
+    const freeusers = await KV.get("FreeUsers") || '';
+    const admin = await KV.get("Admin") || '';
 
+    // 合并所有用户
+    const users = `${defaultusers},${vipusers},${freeusers},${admin}`;
 
- //此处决定an
+    // 自动查找匹配的用户名格式 abc_xxx，并添加后缀
+    users.split(",").forEach(user => {
+      const match = user.match(userRegex);
+      if (match) {
+        foundSuffix = true;
+        suffix = match[1]; // 更新后缀为实际的账号编号
+        fullUserName = user; // 更新为完整的用户名
+      }
+    });
+
+    if (!foundSuffix && !users.split(",").includes(userName)) {
+      await loginlog(userName, 'Bad_PW', 'Error');
+      return generateLoginResponse('Unauthorized access.');
+    }
+
+    // 此处决定 an
     const setan = await KV.get('SetAN');
     let antype = 'Plus';
     let mode = '';
@@ -2924,52 +2961,44 @@ if ((GPTState == 'major_performance')&&(!status)){
 
     // 如果 forcean 为 1，忽略用户输入的 accountNumber，使用后缀作为 accountNumber
     if (foundSuffix && forcean === '1') {
- accountNumber = await getAccountNumber(fullUserName,suffix, antype, 'Check',anissues);
+      accountNumber = await getAccountNumber(fullUserName, suffix, antype, 'Check', anissues);
     } else {
       if (setan == 'True') {
         const plusmode = await KV.get('PlusMode'); //Random/Order
         const freemode = await KV.get('FreeMode'); //Plus/Random/Order
         antype = 'Plus';
         mode = plusmode;
- if (freemode !=='Plus'){
-    if (freeusers.split(",").includes(fullUserName) ){
+        if (freemode !== 'Plus') {
+          if (freeusers.split(",").includes(fullUserName)) {
             antype = 'Free';
             mode = freemode;
           }
         }
- 
-accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, mode,anissues);
-}
-else if (setan)  {
- accountNumber = await getAccountNumber(fullUserName,setan, antype, 'Check',anissues);
-}
-else {
-accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, 'Check',anissues);
+        accountNumber = await getAccountNumber(fullUserName, initialaccountNumber, antype, mode, anissues);
+      } else if (setan) {
+        accountNumber = await getAccountNumber(fullUserName, setan, antype, 'Check', anissues);
+      } else {
+        accountNumber = await getAccountNumber(fullUserName, initialaccountNumber, antype, 'Check', anissues);
       }
     }
-
 
     const refreshTokenKey = `rt_${accountNumber}`;
     const accessTokenKey = `at_${accountNumber}`;
     const accessToken = await KV.get(accessTokenKey);
 
- //使用佬友的sharetoken
- if (accessToken){
+    // 使用佬友的 sharetoken
+    if (accessToken) {
       if (accessToken.startsWith('fk-')) {
-   const fkDomain = await KV.get('FKDomain') ||proxiedDomain;
-   //return Response.redirect(await getOAuthLink(accessToken, fkDomain), 302);
-   return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`)
- }}
+        const fkDomain = await KV.get('FKDomain') || proxiedDomain;
+        return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`);
+      }
+    }
 
     if (isTokenExpired(accessToken)) {
-      // 给没有refresh token的萌新用（比如我），取消下面这行注释即可享用
-     // return generateLoginResponse('The current access token has not been updated.', false);
-      
       // 如果 Token 过期，执行获取新 Token 的逻辑
       const url = 'https://token.oaifree.com/api/auth/refresh';
       const refreshToken = await KV.get(refreshTokenKey);
       if (refreshToken) {
-
         // 发送 POST 请求
         const response = await fetch(url, {
           method: 'POST',
@@ -2989,21 +3018,18 @@ accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype
           await loginlog(fullUserName, `Bad RT_${accountNumber}`, 'Error');
           return generateLoginResponse('Error fetching access token.');
         }
- } 
- else {
+      } else {
         return generateLoginResponse('The current access token has not been updated.');
       }
     }
-    const finalaccessToken = await KV.get(accessTokenKey);
- const shareToken = await getShareToken(fullUserName, finalaccessToken,accountNumber);
 
+    const finalaccessToken = await KV.get(accessTokenKey);
+    const shareToken = await getShareToken(fullUserName, finalaccessToken, accountNumber);
 
     if (shareToken === 'Can not get share token.') {
-     //await KV.put(accessTokenKey, "Bad_AT");
-     await loginlog(fullUserName, `Bad AT_${accountNumber}`,'Error');
+      await loginlog(fullUserName, `Bad AT_${accountNumber}`, 'Error');
       return generateLoginResponse('Error fetching share token.');
     }
-
 
     // Log the successful login
     await loginlog(fullUserName, accountNumber, antype);
@@ -3012,7 +3038,6 @@ accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype
     const headers = new Headers();
     headers.append('Location', oauthLink);
     headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
-     
 
     const response = new Response(null, {
       status: 302,
