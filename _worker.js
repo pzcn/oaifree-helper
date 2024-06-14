@@ -2775,15 +2775,16 @@ async function handleLoginGetRequest(request) {
 }
 
 
-  async function handleLoginPostRequest(request) {
-    const formData = await request.formData();
-    const userName = formData.get('un');
-    const anissues = formData.get('anissues') === 'on';
-    const accountNumber =formData.get('an-custom') || formData.get('an') || '1';
+async function handleLoginPostRequest(request) {
+  const formData = await request.formData();
+  const userName = formData.get('un');
+  const anissues = formData.get('anissues') === 'on';
+  const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
+  const turnstileResponse = formData.get('cf-turnstile-response');
 
-    const turnstileResponse = formData.get('cf-turnstile-response');
-    return await handleLogin(userName, accountNumber, turnstileResponse,anissues);
-  }
+  // 将 request 变量传递给 handleLogin 函数
+  return await handleLogin(userName, accountNumber, turnstileResponse, anissues, request); 
+}
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
   if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
