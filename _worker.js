@@ -150,11 +150,12 @@ if (cookies) {
   
   //处理直链登陆形式
   const params = new URLSearchParams(url.search);
-  const userName = params.get('user');
-  if (userName) {
-      const accountNumber = params.get('an-custom') || params.get('an') || '1';
-      return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
-  }
+  const userName = params.get('usertoken');
+  //if (userName) {
+  //    const accountNumber = params.get('an-custom') || params.get('an') || '1';
+  //    return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
+  //}
+  
 
   if (!admin){
       return handleInitialRequest(request);
