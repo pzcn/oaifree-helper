@@ -7,20 +7,6 @@ addEventListener('fetch', event => {
   
  
  //通用函数
- 
-// 使用 SHA-256 进行哈希
-async function generatePasswordHash(password) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return btoa(String.fromCharCode(...new Uint8Array(hash)));
-}
-
-// 验证输入的密码与存储的哈希密码是否匹配
-async function verifyPassword(inputPassword, storedHashedPassword) {
-  const inputHash = await generatePasswordHash(inputPassword);
-  return inputHash === storedHashedPassword;
-}
 
 
  function parseJwt(token) {
@@ -1692,13 +1678,7 @@ async function handleRegisterPostRequest(request) {
   const cdkey = formData.get('cdkey')
   const username = formData.get('username')
   const turnstileResponse = formData.get('cf-turnstile-response')
-  const password = formData.get('password');
-  if (!password) {
-    return generateRegisterResponse('Password is required');
-  }
 
-  const hashedPassword = await generatePasswordHash(password);
-  await KV.put(`user_${username}_password`, hashedPassword);
   if (!await verifyTurnstile(turnstileResponse)) {
     return generateRegisterResponse('Turnstile verification failed')
   }
@@ -2168,21 +2148,7 @@ async function getRegisterHTML() {
                                               placeholder=" "
                                           />
                                           <label class="email-label" for="cdkey">CDKEY</label>
-                                        <div class="input-wrapper" id="passwordWrapper" style="display: none;">
-                                        <input
-                                            class="email-input"
-                                            inputmode="text"
-                                            type="password"
-                                            id="password"
-                                            name="password"
-                                            autocomplete="off"
-                                            autocapitalize="none"
-                                            spellcheck="false"
-                                            placeholder=" "
-                                            required
-                                        />
-                                        <label class="email-label" for="password">Your Password</label>
-                                        </div>
+                                      </div>
                                       <div class="input-wrapper" id="usernameWrapper" style="display: none;">
                                       <input
                                           class="email-input"
@@ -2788,34 +2754,15 @@ async function handleLoginGetRequest(request) {
 }
 
 
-async function handleLoginPostRequest(request) {
-  const formData = await request.formData();
-  const userName = formData.get('un');
-  const password = formData.get('password');
-  const anissues = formData.get('anissues') === 'on';
-  const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
-  const turnstileResponse = formData.get('cf-turnstile-response');
+  async function handleLoginPostRequest(request) {
+    const formData = await request.formData();
+    const userName = formData.get('un');
+    const anissues = formData.get('anissues') === 'on';
+    const accountNumber =formData.get('an-custom') || formData.get('an') || '1';
 
-  // 验证 Turnstile 响应
-  if (!turnstileResponse || !await verifyTurnstile(turnstileResponse)) {
-    return generateLoginResponse('Turnstile verification failed');
+    const turnstileResponse = formData.get('cf-turnstile-response');
+    return await handleLogin(userName, accountNumber, turnstileResponse,anissues);
   }
-
-  // 检查用户名和密码是否存在
-  if (!userName || !password) {
-    return generateLoginResponse('Username and password are required');
-  }
-
-  // 获取存储的哈希密码
-  const storedHashedPassword = await KV.get(`user_${userName}_password`);
-  if (!storedHashedPassword || !await verifyPassword(password, storedHashedPassword)) {
-    await loginlog(userName, 'Bad_PW', 'Error');
-    return generateLoginResponse('Invalid username or password');
-  }
-
-  // 调用 handleLogin 函数处理登录逻辑
-  return await handleLogin(userName, accountNumber, turnstileResponse, anissues);
-}
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
   if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
@@ -3701,21 +3648,7 @@ async function getLoginHTML(setan) {
                                      />
                                      <label class="email-label" for="un">Username</label>
                                  </div>`;
-                                <div class="input-wrapper">
-                                <input
-                                    class="email-input"
-                                    inputmode="email"
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    autocomplete="current-password"
-                                    autocapitalize="none"
-                                    spellcheck="false"
-                                    required
-                                    placeholder=" "
-                                />
-                                <label class="email-label" for="password">Password</label>
-                                </div>
+ 
    const aliveAccountOptions = await getAliveAccountOptions();
  
    const accountNumberHTML = `
