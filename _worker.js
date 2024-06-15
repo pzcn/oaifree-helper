@@ -2873,7 +2873,7 @@ async function getShareToken(userName, accessToken,accountNumber) {
 }
 
 
-async function handleLogin(userName, password, initialaccountNumber, turnstileResponse, anissues) {
+async function handleLogin(userName, initialaccountNumber, turnstileResponse, anissues) {
     //Turnsile认证
     if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
     return generateLoginResponse('Turnstile verification failed');
@@ -2892,8 +2892,8 @@ async function handleLogin(userName, password, initialaccountNumber, turnstileRe
     const proxiedDomain = await KV.get('WorkerURL');
     const status = await KV.get('Status');
     const GPTState = await getGPTStatus();
-    if ((GPTState == 'major_performance')&&(!status)){
-    await loginlog(userName, 'Bad_OAIStatus','Error');
+if ((GPTState == 'major_performance')&&(!status)){
+  await loginlog(userName, 'Bad_OAIStatus','Error');
         return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
     }
 
