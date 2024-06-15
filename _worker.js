@@ -84,7 +84,10 @@ function generatePassword(token) {
 async function hashPassword(password) {
   return await generatePassword(password); // 使用现有的 generatePassword 函数进行哈希加密
 }
-
+async function verifyPassword(inputPassword, storedHash) {
+  const inputHash = await hashPassword(inputPassword);
+  return inputHash === storedHash;
+}
 
 async function verifyTurnstile(responseToken) {
   const removeTurnstile = await KV.get('RemoveTurnstile')||'';
