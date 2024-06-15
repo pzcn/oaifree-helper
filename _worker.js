@@ -2867,8 +2867,8 @@ async function handleLogin(userName, password, initialaccountNumber, turnstileRe
     return generateLoginResponse('Turnstile verification failed');
   }
 
-  const users = await KV.get('userCredentials');
-  const usersList = users ? JSON.parse(users) : [];
+  const usernm = await KV.get('userCredentials');
+  const usersList = users ? JSON.parse(usernm) : [];
 
   // 验证用户名和密码
   const user = usersList.find(user => user.username === userName);
