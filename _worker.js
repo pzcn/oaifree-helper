@@ -2784,13 +2784,14 @@ async function getHistoryData(queryType) {
 async function handleLoginGetRequest(request) {
   const url = new URL(request.url);
 
+
   const params = new URLSearchParams(url.search);
   const userName = params.get('un');
   const setan = await KV.get('SetAN');
   const accountNumber = params.get('an-custom') || params.get('an') || '1';
 
   if (userName) {
-    return await handleLogin(userName, accountNumber, 'do not need Turnstle', '');
+      return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
   } else {
     const html = await getLoginHTML(setan);
     return new Response(html, { headers: { 'Content-Type': 'text/html' } });
@@ -2801,13 +2802,12 @@ async function handleLoginGetRequest(request) {
 async function handleLoginPostRequest(request) {
     const formData = await request.formData();
     const userName = formData.get('un');
-    const password = formData.get('password');
     const anissues = formData.get('anissues') === 'on';
-    const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
-    const turnstileResponse = formData.get('cf-turnstile-response');
-    return await handleLogin(userName, password, accountNumber, turnstileResponse, anissues);
-}
+    const accountNumber =formData.get('an-custom') || formData.get('an') || '1';
 
+    const turnstileResponse = formData.get('cf-turnstile-response');
+    return await handleLogin(userName, accountNumber, turnstileResponse,anissues);
+}
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
   if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
@@ -2874,9 +2874,9 @@ async function getShareToken(userName, accessToken,accountNumber) {
 
 
 async function handleLogin(userName, password, initialaccountNumber, turnstileResponse, anissues) {
-    // Turnstile认证
-    if (turnstileResponse !== 'do not need Turnstile' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
-        return generateLoginResponse('Turnstile verification failed');
+    //Turnsile认证
+    if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
+    return generateLoginResponse('Turnstile verification failed');
     }
 
     // 初始化 credentials 变量
@@ -2892,8 +2892,8 @@ async function handleLogin(userName, password, initialaccountNumber, turnstileRe
     const proxiedDomain = await KV.get('WorkerURL');
     const status = await KV.get('Status');
     const GPTState = await getGPTStatus();
-    if ((GPTState == 'major_performance') && (!status)) {
-        await loginlog(userName, 'Bad_OAIStatus', 'Error');
+    if ((GPTState == 'major_performance')&&(!status)){
+    await loginlog(userName, 'Bad_OAIStatus','Error');
         return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
     }
 
@@ -3054,20 +3054,24 @@ accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype
     }
   }
   const finalaccessToken = await KV.get(accessTokenKey);
-    const shareToken = await getShareToken(userName, finalaccessToken, accountNumber);
+ const shareToken = await getShareToken(fullUserName, finalaccessToken,accountNumber);
+
 
     if (shareToken === 'Can not get share token.') {
-        await loginlog(userName, `Bad AT_${accountNumber}`, 'Error');
+     //await KV.put(accessTokenKey, "Bad_AT");
+     await loginlog(fullUserName, `Bad AT_${accountNumber}`,'Error');
         return generateLoginResponse('Error fetching share token.');
     }
 
+
     // Log the successful login
-    await loginlog(userName, accountNumber, antype);
+  await loginlog(fullUserName, accountNumber, antype);
 
     const oauthLink = await getOAuthLink(shareToken, proxiedDomain);
     const headers = new Headers();
     headers.append('Location', oauthLink);
     headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
+     
 
     const response = new Response(null, {
         status: 302,
