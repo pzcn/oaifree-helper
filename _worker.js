@@ -2783,15 +2783,13 @@ async function getHistoryData(queryType) {
 //login功能
 async function handleLoginGetRequest(request) {
   const url = new URL(request.url);
-
-
   const params = new URLSearchParams(url.search);
   const userName = params.get('un');
   const setan = await KV.get('SetAN');
   const accountNumber = params.get('an-custom') || params.get('an') || '1';
 
   if (userName) {
-      return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
+      return await handleLogin(userName, '', accountNumber, 'do not need Turnstile', '');
   } else {
     const html = await getLoginHTML(setan);
     return new Response(html, { headers: { 'Content-Type': 'text/html' } });
@@ -2802,11 +2800,11 @@ async function handleLoginGetRequest(request) {
 async function handleLoginPostRequest(request) {
     const formData = await request.formData();
     const userName = formData.get('un');
+    const password = formData.get('password');  // 获取密码
     const anissues = formData.get('anissues') === 'on';
-    const accountNumber =formData.get('an-custom') || formData.get('an') || '1';
-
+    const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
     const turnstileResponse = formData.get('cf-turnstile-response');
-    return await handleLogin(userName, accountNumber, turnstileResponse,anissues);
+    return await handleLogin(userName, password, accountNumber, turnstileResponse, anissues);
 }
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
@@ -2873,7 +2871,7 @@ async function getShareToken(userName, accessToken,accountNumber) {
 }
 
 
-async function handleLogin(userName, initialaccountNumber, turnstileResponse, anissues) {
+async function handleLogin(userName, password, initialaccountNumber, turnstileResponse, anissues) {
     //Turnsile认证
     if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
     return generateLoginResponse('Turnstile verification failed');
