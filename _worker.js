@@ -1719,7 +1719,7 @@ async function handleRegisterPostRequest(request) {
   credentialsObj[username] = hashedPassword;
   await KV.put('UserCredentials', JSON.stringify(credentialsObj));
 
-  return generateRegisterResponse('Registration successful');
+  return generateRegisterResponse('Registration successful')
 }
 
 async function registerlog(userName, cdkey) {
@@ -2207,52 +2207,58 @@ async function getRegisterHTML() {
     </footer>
       <script>
       if ('${removeTurnstile}') {
-   document.getElementById('cf-turnstile-response').value= "111";
-  }
-          document.addEventListener('DOMContentLoaded', function() {
-              const cdkeyInput = document.getElementById('cdkey');
-              const usernameWrapper = document.getElementById('usernameWrapper');
-              const passwordWrapper = document.getElementById('passwordWrapper');
-              const continueBtn = document.getElementById('continueBtn');
-              const manageAccountForm = document.getElementById('manageAccountForm0');
-  
-              continueBtn.addEventListener('click', function() {
-                  if (cdkeyInput.value.trim()) {
-                      usernameWrapper.style.display = 'block';
-                      passwordWrapper.style.display = 'block';
-                  } else {
-                      alert('Please enter your CDKEY.');
-                  }
-              });
-  
-              manageAccountForm.addEventListener('submit', function(event) {
-                  const usernameInput = document.getElementById('username');
-                  const passwordInput = document.getElementById('password');
-                  if (!usernameInput.value.trim() || !passwordInput.value.trim()) {
-                      alert('Please enter your username and password.');
-                      event.preventDefault();
-                  } else if (!document.getElementById('cf-turnstile-response').value) {
-                      alert('Please complete the verification.');
-                      event.preventDefault();
-                  }
-              });
-          });
-  
-          function onTurnstileCallback(token) {
-              document.getElementById('cf-turnstile-response').value = token;
-          }
-      </script>
-      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  </body>
-  </html>
-  `;
-}
+       document.getElementById('cf-turnstile-response').value= "111";
+      }
+        document.addEventListener('DOMContentLoaded', function() {
+            const cdkeyInput = document.getElementById('cdkey');
+            const usernameWrapper = document.getElementById('usernameWrapper');
+            const passwordWrapper = document.getElementById('passwordWrapper');
+            const continueBtn = document.getElementById('continueBtn');
+            const manageAccountForm = document.getElementById('manageAccountForm0');
 
-async function hashPassword(password) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+            continueBtn.addEventListener('click', function() {
+                if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'none') {
+                    usernameWrapper.style.display = 'block';
+                    passwordWrapper.style.display = 'block';
+                } else if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'block') {
+                    const usernameInput = document.getElementById('username');
+                    const passwordInput = document.getElementById('password');
+                    if (usernameInput.value.trim() && passwordInput.value.trim() && document.getElementById('cf-turnstile-response').value) {
+                        manageAccountForm.submit();
+                    } else if (!document.getElementById('cf-turnstile-response').value) {
+                        alert('Please complete the verification.');
+                    } else if (!usernameInput.value.trim()) {
+                        alert('Please enter your username.');
+                    } else if (!passwordInput.value.trim()) {
+                        alert('Please enter your password.');
+                    }
+                }
+            });
+
+            manageAccountForm.addEventListener('submit', function(event) {
+                if (!document.getElementById('cf-turnstile-response').value) {
+                    alert('Please complete the verification.');
+                    event.preventDefault();
+                }
+            });
+        });
+
+        function onTurnstileCallback(token) {
+            document.getElementById('cf-turnstile-response').value = token;
+        }
+    </script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</body>
+</html>
+
+function onTurnstileCallback(token) {
+    document.getElementById('cf-turnstile-response').value = token;
+}
+              </script>
+              <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+          </body>
+          </html>
+  `;
 }
 
 
