@@ -2251,9 +2251,6 @@ async function getRegisterHTML() {
             });
         });
 
-        function onTurnstileCallback(token) {
-            document.getElementById('cf-turnstile-response').value = token;
-        }
     </script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>
