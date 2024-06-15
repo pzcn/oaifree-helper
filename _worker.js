@@ -1673,6 +1673,8 @@ if ('${removeTurnstile}') {
 
 async function verifyPassword(inputPassword, storedHash) {
     const inputHash = await hashPassword(inputPassword);
+    console.log(`Debug: inputHash=${inputHash}`);
+    console.log(`Debug: storedHash=${storedHash}`);
     return inputHash === storedHash;
 }
 
