@@ -81,6 +81,11 @@ function generatePassword(token) {
   //console.log(`userName: ${token}, Password: ${passwd},`);
   return hashStr.substring(0, 15)
 }
+async function hashPassword(password) {
+  return await generatePassword(password); // 使用现有的 generatePassword 函数进行哈希加密
+}
+
+
 async function verifyTurnstile(responseToken) {
   const removeTurnstile = await KV.get('RemoveTurnstile')||'';
   if (removeTurnstile){return 'true'}
@@ -1672,11 +1677,12 @@ if ('${removeTurnstile}') {
 
 
 
-//Register功能
+// Register功能
 async function handleRegisterPostRequest(request) {
   const formData = await request.formData()
   const cdkey = formData.get('cdkey')
   const username = formData.get('username')
+  const password = formData.get('password')
   const turnstileResponse = formData.get('cf-turnstile-response')
 
   if (!await verifyTurnstile(turnstileResponse)) {
@@ -1697,15 +1703,16 @@ async function handleRegisterPostRequest(request) {
   await KV.put('CDKEY', updatedCdkeyList.join(','))
   }
 
-  // Add new user to freeusers
-  const freeUsers = await KV.get('FreeUsers')
-  const freeUsersList = freeUsers ? freeUsers.split(',') : []
-  if (freeUsersList.includes(username)) {
-    return generateRegisterResponse('Username already exist.')
+  // Add new user to users list with hashed password
+  const users = await KV.get('Users')
+  const usersList = users ? JSON.parse(users) : []
+  if (usersList.some(user => user.username === username)) {
+    return generateRegisterResponse('Username already exists.')
   }
-    freeUsersList.push(username)
-    await KV.put('FreeUsers', freeUsersList.join(','))
-  
+
+  const hashedPassword = await hashPassword(password)
+  usersList.push({ username, password: hashedPassword })
+  await KV.put('Users', JSON.stringify(usersList))
 
   return generateRegisterResponse('Registration successful')
 }
@@ -1725,7 +1732,7 @@ async function registerlog(userName, cdkey) {
   }
   logArray.push(logEntry);
   await KV.put(`RegisterLogs`, JSON.stringify(logArray));
- }
+}
 
 async function generateRegisterResponse(message) {
    const errorHtml = `
@@ -1742,15 +1749,14 @@ async function generateRegisterResponse(message) {
      errorHtml + '<button class="continue-btn" type="button" id="continueBtn">Continue</button>'
    );
    return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
- }
+}
 
- 
 async function getRegisterHTML() {
-  const WorkerURL=await KV.get('WorkerURL');
-  const turnstileSiteKey=await KV.get('TurnstileSiteKey');
+  const WorkerURL = await KV.get('WorkerURL');
+  const turnstileSiteKey = await KV.get('TurnstileSiteKey');
   const websiteName = await KV.get('WebName') || 'ChatGPT';
   const logourl = await KV.get('LogoURL') || logo;
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -1761,7 +1767,7 @@ async function getRegisterHTML() {
       <link rel="icon" type="image/png" sizes="16x16" href="https://cdn4.oaifree.com/_next/static/media/favicon-16x16.a052137e.png"/>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Sign Up - ${websiteName}</title>
-      <style>
+            <style>
           @charset "UTF-8";
           .oai-header img {
               height: auto;
@@ -2120,106 +2126,128 @@ async function getRegisterHTML() {
       }
 
           </style>
-          </head>
-          <body>
-              <div id="root">
-                  <div class="page-wrapper">
-                      <header class="oai-header">
-                          <a href="https://${WorkerURL}/admin">
-                              <img src="${logourl}" alt="Logo">
-                          </a>
-                      </header>
-                      <main class="main-container">
-                          <section class="content-wrapper">
-                              <div class="title-wrapper"><h1 class="title">Create your account</h1></div>
-                              <div class="login-container">
-                                  <form id="manageAccountForm0" action="/register" method="POST">
-                                      <div class="input-wrapper" id="cdkeyWrapper">
-                                          <input
-                                              class="email-input"
-                                              inputmode="text"
-                                              type="text"
-                                              id="cdkey"
-                                              name="cdkey"
-                                              autocomplete="off"
-                                              autocapitalize="none"
-                                              spellcheck="false"
-                                              required
-                                              placeholder=" "
-                                          />
-                                          <label class="email-label" for="cdkey">CDKEY</label>
-                                      </div>
-                                      <div class="input-wrapper" id="usernameWrapper" style="display: none;">
-                                      <input
-                                          class="email-input"
-                                          inputmode="text"
-                                          type="text"
-                                          id="username"
-                                          name="username"
-                                          autocomplete="off"
-                                          autocapitalize="none"
-                                          spellcheck="false"
-                                          placeholder=" "
-                                          required
-                                      />
-                                      <label class="email-label" for="username">Your Username</label>
-                                    </div>
-                                      <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
-                                      <button class="continue-btn" type="button" id="continueBtn">Continue</button>
-                                      <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
-                                  </form>
-          
-                                  <div class="divider-wrapper"><span class="divider">Or</span></div>
-                                  <p class="other-page">Already have an account? <a class="other-page-link" href="https://${WorkerURL}">Login</a></p>
+  </head>
+  <body>
+      <div id="root">
+          <div class="page-wrapper">
+              <header class="oai-header">
+                  <a href="https://${WorkerURL}/admin">
+                      <img src="${logourl}" alt="Logo">
+                  </a>
+              </header>
+              <main class="main-container">
+                  <section class="content-wrapper">
+                      <div class="title-wrapper"><h1 class="title">Create your account</h1></div>
+                      <div class="login-container">
+                          <form id="manageAccountForm0" action="/register" method="POST">
+                              <div class="input-wrapper" id="cdkeyWrapper">
+                                  <input
+                                      class="email-input"
+                                      inputmode="text"
+                                      type="text"
+                                      id="cdkey"
+                                      name="cdkey"
+                                      autocomplete="off"
+                                      autocapitalize="none"
+                                      spellcheck="false"
+                                      required
+                                      placeholder=" "
+                                  />
+                                  <label class="email-label" for="cdkey">CDKEY</label>
                               </div>
-                          </section>
-                      </main>
-                  </div>
-              </div>
-              <footer class="footer">
-                <p>&copy; All rights reserved. | Powered by <a href="https://linux.do" target="_blank">Pandora</a> & <a href="https://chatgpt.com" target="_blank">ChatGPT</a></p>
-            </footer>
-              <script>
-              if ('${removeTurnstile}') {
-       document.getElementById('cf-turnstile-response').value= "111";
-      }
-                  document.addEventListener('DOMContentLoaded', function() {
-                      const cdkeyInput = document.getElementById('cdkey');
-                      const usernameWrapper = document.getElementById('usernameWrapper');
-                      const continueBtn = document.getElementById('continueBtn');
-                      const manageAccountForm = document.getElementById('manageAccountForm0');
-          
-                      continueBtn.addEventListener('click', function() {
-                          if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'none') {
-                              usernameWrapper.style.display = 'block';
-                          } else if (cdkeyInput.value.trim() && usernameWrapper.style.display === 'block') {
-                              const usernameInput = document.getElementById('username');
-                              if (usernameInput.value.trim() && document.getElementById('cf-turnstile-response').value) {
-                                  manageAccountForm.submit();
-                              } else if (!document.getElementById('cf-turnstile-response').value) {
-                                  alert('Please complete the verification.');
-                              } else {
-                                  alert('Please enter your username.');
-                              }
-                          }
-                      });
-          
-                      manageAccountForm.addEventListener('submit', function(event) {
-                          if (!document.getElementById('cf-turnstile-response').value) {
-                              alert('Please complete the verification.');
-                              event.preventDefault();
-                          }
-                      });
-                  });
-          
-                  function onTurnstileCallback(token) {
-                      document.getElementById('cf-turnstile-response').value = token;
+                              <div class="input-wrapper" id="usernameWrapper" style="display: none;">
+                              <input
+                                  class="email-input"
+                                  inputmode="text"
+                                  type="text"
+                                  id="username"
+                                  name="username"
+                                  autocomplete="off"
+                                  autocapitalize="none"
+                                  spellcheck="false"
+                                  placeholder=" "
+                                  required
+                              />
+                              <label class="email-label" for="username">Your Username</label>
+                            </div>
+                            <div class="input-wrapper" id="passwordWrapper" style="display: none;">
+                              <input
+                                  class="email-input"
+                                  inputmode="text"
+                                  type="password"
+                                  id="password"
+                                  name="password"
+                                  autocomplete="off"
+                                  autocapitalize="none"
+                                  spellcheck="false"
+                                  placeholder=" "
+                                  required
+                              />
+                              <label class="email-label" for="password">Your Password</label>
+                            </div>
+                              <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
+                              <button class="continue-btn" type="button" id="continueBtn">Continue</button>
+                              <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
+                          </form>
+  
+                          <div class="divider-wrapper"><span class="divider">Or</span></div>
+                          <p class="other-page">Already have an account? <a class="other-page-link" href="https://${WorkerURL}">Login</a></p>
+                      </div>
+                  </section>
+              </main>
+          </div>
+      </div>
+      <footer class="footer">
+        <p>&copy; All rights reserved. | Powered by <a href="https://linux.do" target="_blank">Pandora</a> & <a href="https://chatgpt.com" target="_blank">ChatGPT</a></p>
+    </footer>
+      <script>
+      if ('${removeTurnstile}') {
+   document.getElementById('cf-turnstile-response').value= "111";
+  }
+          document.addEventListener('DOMContentLoaded', function() {
+              const cdkeyInput = document.getElementById('cdkey');
+              const usernameWrapper = document.getElementById('usernameWrapper');
+              const passwordWrapper = document.getElementById('passwordWrapper');
+              const continueBtn = document.getElementById('continueBtn');
+              const manageAccountForm = document.getElementById('manageAccountForm0');
+  
+              continueBtn.addEventListener('click', function() {
+                  if (cdkeyInput.value.trim()) {
+                      usernameWrapper.style.display = 'block';
+                      passwordWrapper.style.display = 'block';
+                  } else {
+                      alert('Please enter your CDKEY.');
                   }
-              </script>
-              <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-          </body>
-          </html>
+              });
+  
+              manageAccountForm.addEventListener('submit', function(event) {
+                  const usernameInput = document.getElementById('username');
+                  const passwordInput = document.getElementById('password');
+                  if (!usernameInput.value.trim() || !passwordInput.value.trim()) {
+                      alert('Please enter your username and password.');
+                      event.preventDefault();
+                  } else if (!document.getElementById('cf-turnstile-response').value) {
+                      alert('Please complete the verification.');
+                      event.preventDefault();
+                  }
+              });
+          });
+  
+          function onTurnstileCallback(token) {
+              document.getElementById('cf-turnstile-response').value = token;
+          }
+      </script>
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  </body>
+  </html>
   `;
+}
+
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 
@@ -2739,14 +2767,13 @@ async function getHistoryData(queryType) {
 async function handleLoginGetRequest(request) {
   const url = new URL(request.url);
 
-    
   const params = new URLSearchParams(url.search);
   const userName = params.get('un');
   const setan = await KV.get('SetAN');
   const accountNumber = params.get('an-custom') || params.get('an') || '1';
 
   if (userName) {
-      return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
+    return await handleLogin(userName, accountNumber, 'do not need Turnstle', '');
   } else {
     const html = await getLoginHTML(setan);
     return new Response(html, { headers: { 'Content-Type': 'text/html' } });
@@ -2754,19 +2781,20 @@ async function handleLoginGetRequest(request) {
 }
 
 
-  async function handleLoginPostRequest(request) {
-    const formData = await request.formData();
-    const userName = formData.get('un');
-    const anissues = formData.get('anissues') === 'on';
-    const accountNumber =formData.get('an-custom') || formData.get('an') || '1';
+async function handleLoginPostRequest(request) {
+  const formData = await request.formData();
+  const userName = formData.get('un');
+  const password = formData.get('pw');
+  const anissues = formData.get('anissues') === 'on';
+  const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
+  const turnstileResponse = formData.get('cf-turnstile-response');
 
-    const turnstileResponse = formData.get('cf-turnstile-response');
-    return await handleLogin(userName, accountNumber, turnstileResponse,anissues);
-  }
+  return await handleLogin(userName, password, accountNumber, turnstileResponse, anissues);
+}
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
   if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
-      return true;
+    return true;
   }
   const payload = parseJwt(token);
   const currentTime = Math.floor(Date.now() / 1000);// 获取当前时间戳（秒）
@@ -2775,34 +2803,34 @@ function isTokenExpired(token) {
 async function getOAuthLink(shareToken, proxiedDomain) {
   // const url = `https://${proxiedDomain}/api/auth/oauth_token`;
    // 不知道为什么，好像没法直接通过反代的服务器获取oauth link
- const url = `https://new.oaifree.com/api/auth/oauth_token`;
- const response = await fetch(url, {
-     method: 'POST',
-     headers: {
-         'Origin': `https://${proxiedDomain}`,
-         'Content-Type': 'application/json',
-     },
-     body: JSON.stringify({
-         share_token: shareToken
-     })
+  const url = `https://new.oaifree.com/api/auth/oauth_token`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Origin': `https://${proxiedDomain}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      share_token: shareToken
+    })
  })
- const data = await response.json();
- return data.login_url;
+  const data = await response.json();
+  return data.login_url;
 }
 async function getShareToken(userName, accessToken,accountNumber) {
- const url = 'https://chat.oaifree.com/token/register'; 
+  const url = 'https://chat.oaifree.com/token/register';
  // const tokenPrefix = await KV.get('TokenPrefix');
  //const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号
 
  const isAdmin = await usermatch(userName, 'Admin') || userName=='atdirect';
  const isVIP = await usermatch(userName, 'VIPUsers') || await usermatch(userName, 'Admin') ;
- const isFreeUsers = await usermatch(userName, 'FreeUsers');
- const isTemporary = await usermatch(accountNumber, 'TemporaryAN') && !isAdmin;
+  const isFreeUsers = await usermatch(userName, 'FreeUsers');
+  const isTemporary = await usermatch(accountNumber, 'TemporaryAN') && !isAdmin;
 
- const passwd = await generatePassword(userName);
- 
+  const passwd = await generatePassword(userName);
+
  //console.log(`getShareToken - userName: ${userName}, accountNumber: ${accountNumber}, showConversations: ${isAdmin}, isVIP: ${isVIP}, isTemporary: ${isTemporary}, accessToken: ${accessToken}, passwd: ${passwd}`);
- const body = new URLSearchParams({
+  const body = new URLSearchParams({
      access_token: accessToken,  // 使用从全局变量中获取的 accessToken
      unique_name: passwd, //前缀+无后缀用户名
      site_limit: '', // 限制的网站
@@ -2813,73 +2841,83 @@ async function getShareToken(userName, accessToken,accountNumber) {
      temporary_chat: isTemporary ? 'true' : 'false', //默认启用临时聊天
      show_userinfo: isAdmin ? 'true' : 'false',  // 是否显示用户信息
      reset_limit: 'false' // 是否重置对话限制
- }).toString();
- const apiResponse = await fetch(url, {
-     method: 'POST',
-     headers: {
-         'Content-Type': 'application/x-www-form-urlencoded'
-     },
-     body: body
- });
- const responseText = await apiResponse.text();
- const tokenKeyMatch = /"token_key":"([^"]+)"/.exec(responseText);
- const tokenKey = tokenKeyMatch ? tokenKeyMatch[1] : 'Can not get share token.';
- return tokenKey;
+  }).toString();
+  const apiResponse = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: body
+  });
+  const responseText = await apiResponse.text();
+  const tokenKeyMatch = /"token_key":"([^"]+)"/.exec(responseText);
+  const tokenKey = tokenKeyMatch ? tokenKeyMatch[1] : 'Can not get share token.';
+  return tokenKey;
 }
 
 
-async function handleLogin(userName, initialaccountNumber, turnstileResponse,anissues) {
-//Turnsile认证
-if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
-   return generateLoginResponse('Turnstile verification failed');
-}
-const proxiedDomain = await KV.get('WorkerURL');
-const status = await KV.get('Status');
-const GPTState = await getGPTStatus();
+async function handleLogin(userName, password, initialaccountNumber, turnstileResponse, anissues) {
+  // Turnstile认证
+  if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
+    return generateLoginResponse('Turnstile verification failed');
+  }
+
+  const users = await KV.get('Users');
+  const usersList = users ? JSON.parse(users) : [];
+
+  // 验证用户名和密码
+  const user = usersList.find(user => user.username === userName);
+  if (!user || !(await verifyPassword(password, user.password))) {
+    await loginlog(userName, 'Bad_PW', 'Error');
+    return generateLoginResponse('Unauthorized access.');
+  }
+  const proxiedDomain = await KV.get('WorkerURL');
+  const status = await KV.get('Status');
+  const GPTState = await getGPTStatus();
 if ((GPTState == 'major_performance')&&(!status)){
   await loginlog(userName, 'Bad_OAIStatus','Error');
-  return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
-}
+    return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
+  }
 
  //先尝试json
- try {
-     const tokenData = JSON.parse(userName);
-     if (tokenData.accessToken) {
+  try {
+    const tokenData = JSON.parse(userName);
+    if (tokenData.accessToken) {
       const jsonAccessToken = tokenData.accessToken;
       const shareToken = await getShareToken('atdirect', jsonAccessToken, '0');
       if (shareToken === 'Can not get share token.') {
-       return generateLoginResponse('Error fetching share token.');
-     }
-   
-     return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+        return generateLoginResponse('Error fetching share token.');
+      }
+
+      return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
     }
-   } catch (e) {
+  } catch (e) {
      // 输入不是 JSON 格式
-   }
+  }
 
 // 如果输入用户名长度大于50，直接视作accessToken
-if (userName.length > 50) {
- const shareToken = await getShareToken('atdirect', userName, '0');
+  if (userName.length > 50) {
+    const shareToken = await getShareToken('atdirect', userName, '0');
 
- if (shareToken === 'Can not get share token.') {
-   return generateLoginResponse('Error fetching share token.');
- }
+    if (shareToken === 'Can not get share token.') {
+      return generateLoginResponse('Error fetching share token.');
+    }
 
- return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
-}
+    return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+  }
 
 
 // 如果输入用户名fk开头，直接视作sharetoken
-if (userName.startsWith('fk-')) {
- const shareToken = userName;
- return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
-}
+  if (userName.startsWith('fk-')) {
+    const shareToken = userName;
+    return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
+  }
 
- const userRegex = new RegExp(`^${userName}_(\\d+)$`);
- let fullUserName = userName;
- let foundSuffix = false;
- let suffix = '';
- const forcean = await KV.get("ForceAN");
+  const userRegex = new RegExp(`^${userName}_(\\d+)$`);
+  let fullUserName = userName;
+  let foundSuffix = false;
+  let suffix = '';
+  const forcean = await KV.get("ForceAN");
   const defaultusers = await KV.get("Users")|| '';
   const vipusers = await KV.get("VIPUsers")|| '';
   const freeusers = await KV.get("FreeUsers")|| '';
@@ -2889,26 +2927,26 @@ if (userName.startsWith('fk-')) {
 
 
  // 自动查找匹配的用户名格式abc_xxx，并添加后缀
- users.split(",").forEach(user => {
-   const match = user.match(userRegex);
-       if (match) {
-           foundSuffix = true;
+  users.split(",").forEach(user => {
+    const match = user.match(userRegex);
+    if (match) {
+      foundSuffix = true;
            suffix = match[1];  // 更新后缀为实际的账号编号
            fullUserName = user; // 更新为完整的用户名
-       }
-   });
-    
-if (!foundSuffix && !users.split(",").includes(userName)) {
+    }
+  });
+
+  if (!foundSuffix && !users.split(",").includes(userName)) {
    await loginlog(userName, 'Bad_PW','Error');
-   return generateLoginResponse('Unauthorized access.');
-}
+    return generateLoginResponse('Unauthorized access.');
+  }
 
   
  //用户权限判断，仅在users库内的用户可使用所有车(前置已判断，不过也不用删)
- if (!users.split(",").includes(fullUserName)) {
+  if (!users.split(",").includes(fullUserName)) {
      await loginlog(userName, 'Bad_PW','Error');
-     return generateLoginResponse('Unauthorized access.');
- }
+    return generateLoginResponse('Unauthorized access.');
+  }
  //禁止免费用户使用序号大于99的vip私享车
 // if (freeusers.split(",").includes(fullUserName) && accountNumber > 99) {
 //     return new Response('Unauthorized access, you are vip users.', { status: 200 });
@@ -2926,20 +2964,20 @@ if (!foundSuffix && !users.split(",").includes(userName)) {
   let accountNumber = '';
 
    // 如果 forcean 为 1，忽略用户输入的 accountNumber，使用后缀作为 accountNumber
-if (foundSuffix && forcean === '1') {
+  if (foundSuffix && forcean === '1') {
  accountNumber = await getAccountNumber(fullUserName,suffix, antype, 'Check',anissues);
-} else {
-if (setan == 'True') {
+  } else {
+    if (setan == 'True') {
   const plusmode = await KV.get('PlusMode'); //Random/Order
   const freemode = await KV.get('FreeMode'); //Plus/Random/Order
-     antype = 'Plus';
-     mode = plusmode;
+      antype = 'Plus';
+      mode = plusmode;
  if (freemode !=='Plus'){
     if (freeusers.split(",").includes(fullUserName) ){
-     antype = 'Free';
-     mode = freemode;
-     }
- }
+          antype = 'Free';
+          mode = freemode;
+        }
+      }
  
 accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, mode,anissues);
 }
@@ -2948,277 +2986,277 @@ else if (setan)  {
 }
 else {
 accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, 'Check',anissues);
-}
-}
+    }
+  }
 
 
- const refreshTokenKey = `rt_${accountNumber}`;
- const accessTokenKey = `at_${accountNumber}`;
- const accessToken = await KV.get(accessTokenKey);
+  const refreshTokenKey = `rt_${accountNumber}`;
+  const accessTokenKey = `at_${accountNumber}`;
+  const accessToken = await KV.get(accessTokenKey);
 
  //使用佬友的sharetoken
  if (accessToken){
- if (accessToken.startsWith('fk-')) {
+    if (accessToken.startsWith('fk-')) {
    const fkDomain = await KV.get('FKDomain') ||proxiedDomain;
    //return Response.redirect(await getOAuthLink(accessToken, fkDomain), 302);
    return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`)
  }}
- 
- if (isTokenExpired(accessToken)) {
+
+  if (isTokenExpired(accessToken)) {
       // 给没有refresh token的萌新用（比如我），取消下面这行注释即可享用
      // return generateLoginResponse('The current access token has not been updated.', false);
       
       // 如果 Token 过期，执行获取新 Token 的逻辑
-      const url = 'https://token.oaifree.com/api/auth/refresh';
-     const refreshToken = await KV.get(refreshTokenKey);
-     if (refreshToken) {
+    const url = 'https://token.oaifree.com/api/auth/refresh';
+    const refreshToken = await KV.get(refreshTokenKey);
+    if (refreshToken) {
 
       // 发送 POST 请求
-     const response = await fetch(url, {
-         method: 'POST',
-         headers: {
-             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-         },
-         body: `refresh_token=${refreshToken}`
-     });
-    
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: `refresh_token=${refreshToken}`
+      });
+
      // 检查响应状态
-     if (response.ok) {
-         const data = await response.json();
-         const newAccessToken = data.access_token;
-         await KV.put(accessTokenKey, newAccessToken);
-     } else {
-         await KV.put(accessTokenKey, "Bad_RT");
+      if (response.ok) {
+        const data = await response.json();
+        const newAccessToken = data.access_token;
+        await KV.put(accessTokenKey, newAccessToken);
+      } else {
+        await KV.put(accessTokenKey, "Bad_RT");
          await loginlog(fullUserName, `Bad RT_${accountNumber}`,'Error');
-         return generateLoginResponse('Error fetching access token.');
-     }
+        return generateLoginResponse('Error fetching access token.');
+      }
  } 
  else {
-   return generateLoginResponse('The current access token has not been updated.');
- }
- }   
-     const finalaccessToken = await KV.get(accessTokenKey);
+      return generateLoginResponse('The current access token has not been updated.');
+    }
+  }
+  const finalaccessToken = await KV.get(accessTokenKey);
  const shareToken = await getShareToken(fullUserName, finalaccessToken,accountNumber);
 
- 
- if (shareToken === 'Can not get share token.') {
+
+  if (shareToken === 'Can not get share token.') {
      //await KV.put(accessTokenKey, "Bad_AT");
      await loginlog(fullUserName, `Bad AT_${accountNumber}`,'Error');
-     return generateLoginResponse('Error fetching share token.');
- }
+    return generateLoginResponse('Error fetching share token.');
+  }
 
  
   // Log the successful login
   await loginlog(fullUserName, accountNumber, antype);
 
   const oauthLink = await getOAuthLink(shareToken, proxiedDomain);
-       const headers = new Headers();
-     headers.append('Location', oauthLink);
-     headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
+  const headers = new Headers();
+  headers.append('Location', oauthLink);
+  headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
      
-     
-       const response = new Response(null, {
-           status: 302,
-           headers: headers
-       });
-       return response;
+
+  const response = new Response(null, {
+    status: 302,
+    headers: headers
+  });
+  return response;
 }
 
 async function loginlog(userName, accountNumber, antype) {
- const currentTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
- const timestamp = Date.now();
- const logEntry = {
-     user: userName,
-     accountNumber: accountNumber,
-     time: currentTime,
-     timestamp: timestamp
- };
+  const currentTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+  const timestamp = Date.now();
+  const logEntry = {
+    user: userName,
+    accountNumber: accountNumber,
+    time: currentTime,
+    timestamp: timestamp
+  };
  // Retrieve the existing log array or create a new one if it doesn't exist
- const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
- let logArray = [];
- if (lastLoginLogs) {
-     logArray = JSON.parse(lastLoginLogs);
- }
- logArray.push(logEntry);
- await KV.put(`${antype}LoginLogs`, JSON.stringify(logArray));
+  const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
+  let logArray = [];
+  if (lastLoginLogs) {
+    logArray = JSON.parse(lastLoginLogs);
+  }
+  logArray.push(logEntry);
+  await KV.put(`${antype}LoginLogs`, JSON.stringify(logArray));
 }
 
 async function deletelog(userName, accountNumber,antype) {
- const currentTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
- const logEntry = {
-     user: userName,
-     time: currentTime,
-     accountNumber: accountNumber
- };
+  const currentTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+  const logEntry = {
+    user: userName,
+    time: currentTime,
+    accountNumber: accountNumber
+  };
  // Retrieve the existing log array or create a new one if it doesn't exist
- const lastDeleteLogs = await KV.get(`${antype}DeleteLogs`);
- let logArray = [];
- if (lastDeleteLogs) {
-     logArray = JSON.parse(lastDeleteLogs);
- }
- logArray.push(logEntry);
- await KV.put(`${antype}DeleteLogs`, JSON.stringify(logArray));
+  const lastDeleteLogs = await KV.get(`${antype}DeleteLogs`);
+  let logArray = [];
+  if (lastDeleteLogs) {
+    logArray = JSON.parse(lastDeleteLogs);
+  }
+  logArray.push(logEntry);
+  await KV.put(`${antype}DeleteLogs`, JSON.stringify(logArray));
 }
 
 //AN获取和删除
 async function getAccountNumber(userName, initialaccountNumber, antype, mode, anissues) {
  const currentTime = Date.now()
- const Milliseconds = 3 * 60 * 1000;
- 
- const checkAndRemoveIssueAccount = async (accountNumber) => {
+  const Milliseconds = 3 * 60 * 1000;
+
+  const checkAndRemoveIssueAccount = async (accountNumber) => {
    // Retrieve the login logs
-   const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
-   if (lastLoginLogs) {
-     const logArray = JSON.parse(lastLoginLogs);
-     const userLogs = logArray.filter(log => log.user === userName && log.accountNumber === accountNumber);
-     if (userLogs.length > 0) {
-       const recentLogins = userLogs.filter(log => {
-         const logTime = log.timestamp;
-         return currentTime - logTime <= Milliseconds;
-       });
-       if (recentLogins.length >= 1 && anissues) {
+    const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
+    if (lastLoginLogs) {
+      const logArray = JSON.parse(lastLoginLogs);
+      const userLogs = logArray.filter(log => log.user === userName && log.accountNumber === accountNumber);
+      if (userLogs.length > 0) {
+        const recentLogins = userLogs.filter(log => {
+          const logTime = log.timestamp;
+          return currentTime - logTime <= Milliseconds;
+        });
+        if (recentLogins.length >= 1 && anissues) {
          // 删除问题账号
-         const aliveAccount = await KV.get(`${antype}AliveAccounts`);
-         let aliveAccountList = aliveAccount.split(',');
-         aliveAccountList = aliveAccountList.filter(acc => acc !== accountNumber.toString());
-         await KV.put(`${antype}AliveAccounts`, aliveAccountList.join(','));
+          const aliveAccount = await KV.get(`${antype}AliveAccounts`);
+          let aliveAccountList = aliveAccount.split(',');
+          aliveAccountList = aliveAccountList.filter(acc => acc !== accountNumber.toString());
+          await KV.put(`${antype}AliveAccounts`, aliveAccountList.join(','));
          await deletelog(userName, accountNumber,antype);
-         return true;
-       }
-     }
-   }
-   return false;
- };
+          return true;
+        }
+      }
+    }
+    return false;
+  };
 
  // 顺序读取
- if (mode == 'Order') {
-   const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
-   let aliveAccounts = aliveAccountString
-     .split(',')
-     .map(num => parseInt(num, 10))
-     .filter(num => !isNaN(num));
+  if (mode == 'Order') {
+    const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
+    let aliveAccounts = aliveAccountString
+      .split(',')
+      .map(num => parseInt(num, 10))
+      .filter(num => !isNaN(num));
 
-   if (aliveAccounts.length > 0) {
-     let minAccount = Math.min(...aliveAccounts);
-     if (await checkAndRemoveIssueAccount(minAccount)) {
-       aliveAccounts = aliveAccounts.filter(acc => acc !== minAccount);
-       minAccount = aliveAccounts.length > 0 ? Math.min(...aliveAccounts) : 1;
-     }
-     return minAccount;
-   }
-   return 1;
- }
+    if (aliveAccounts.length > 0) {
+      let minAccount = Math.min(...aliveAccounts);
+      if (await checkAndRemoveIssueAccount(minAccount)) {
+        aliveAccounts = aliveAccounts.filter(acc => acc !== minAccount);
+        minAccount = aliveAccounts.length > 0 ? Math.min(...aliveAccounts) : 1;
+      }
+      return minAccount;
+    }
+    return 1;
+  }
 
  // 检测和删除问题账号
- if (mode == 'Check') {
-   await checkAndRemoveIssueAccount(initialaccountNumber);
-   return initialaccountNumber;
- }
+  if (mode == 'Check') {
+    await checkAndRemoveIssueAccount(initialaccountNumber);
+    return initialaccountNumber;
+  }
 
  // 随机读取
- if (mode == 'Random') {
+  if (mode == 'Random') {
    // Retrieve the last login logs
-   const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
-   if (lastLoginLogs) {
-     const logArray = JSON.parse(lastLoginLogs);
-     const userLogs = logArray.filter(log => log.user === userName);
-     const recentLogins = userLogs.filter(log => {
-       const logTime = log.timestamp;
-       return currentTime - logTime <= Milliseconds;
-     });
+    const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
+    if (lastLoginLogs) {
+      const logArray = JSON.parse(lastLoginLogs);
+      const userLogs = logArray.filter(log => log.user === userName);
+      const recentLogins = userLogs.filter(log => {
+        const logTime = log.timestamp;
+        return currentTime - logTime <= Milliseconds;
+      });
 
-     if (recentLogins.length > 0) {
-       const lastAccount = recentLogins[recentLogins.length - 1].accountNumber;
-       if (await checkAndRemoveIssueAccount(lastAccount)) {
-         const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
-         const aliveAccounts = aliveAccountString
-           .split(',')
-           .map(num => parseInt(num, 10))
-           .filter(num => !isNaN(num));
+      if (recentLogins.length > 0) {
+        const lastAccount = recentLogins[recentLogins.length - 1].accountNumber;
+        if (await checkAndRemoveIssueAccount(lastAccount)) {
+          const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
+          const aliveAccounts = aliveAccountString
+            .split(',')
+            .map(num => parseInt(num, 10))
+            .filter(num => !isNaN(num));
 
-         if (aliveAccounts.length > 0) {
-           const randomAccount = aliveAccounts[Math.floor(Math.random() * aliveAccounts.length)];
-           return randomAccount;
-         }
-         return 0;
-       }
-       return lastAccount;
-     }
-   }
-   const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
-   let aliveAccounts = aliveAccountString
-     .split(',')
-     .map(num => parseInt(num, 10))
-     .filter(num => !isNaN(num));
+          if (aliveAccounts.length > 0) {
+            const randomAccount = aliveAccounts[Math.floor(Math.random() * aliveAccounts.length)];
+            return randomAccount;
+          }
+          return 0;
+        }
+        return lastAccount;
+      }
+    }
+    const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
+    let aliveAccounts = aliveAccountString
+      .split(',')
+      .map(num => parseInt(num, 10))
+      .filter(num => !isNaN(num));
 
-   if (aliveAccounts.length > 0) {
-     let randomAccount = aliveAccounts[Math.floor(Math.random() * aliveAccounts.length)];
-     if (await checkAndRemoveIssueAccount(randomAccount)) {
-       aliveAccounts = aliveAccounts.filter(acc => acc !== randomAccount);
-       if (aliveAccounts.length > 0) {
-         randomAccount = aliveAccounts[Math.floor(Math.random() * aliveAccounts.length)];
-         return randomAccount;
-       }
-       return 0;
-     }
-     return randomAccount;
-   }
-   return 0;
- }
+    if (aliveAccounts.length > 0) {
+      let randomAccount = aliveAccounts[Math.floor(Math.random() * aliveAccounts.length)];
+      if (await checkAndRemoveIssueAccount(randomAccount)) {
+        aliveAccounts = aliveAccounts.filter(acc => acc !== randomAccount);
+        if (aliveAccounts.length > 0) {
+          randomAccount = aliveAccounts[Math.floor(Math.random() * aliveAccounts.length)];
+          return randomAccount;
+        }
+        return 0;
+      }
+      return randomAccount;
+    }
+    return 0;
+  }
 
- return initialaccountNumber;
+  return initialaccountNumber;
 }
 
 
 
 async function generateLoginResponse(message) {
- const setan = await KV.get('SetAN');
-   const errorHtml = `
-   <div class="ulp-field ulp-error">
-     <div class="ulp-error-info">
-       <span class="ulp-input-error-icon" role="img" aria-label="Error"></span>
-       ${message}
-     </div>
-   </div>
-   `;
-   const html = await getLoginHTML(setan);
-   const responseHtml = html.replace(
-     '<button class="continue-btn" type="submit">Continue</button>',
-     errorHtml + '<button class="continue-btn" type="submit">Continue</button>'
-   );
-   return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
- }
- 
+  const setan = await KV.get('SetAN');
+  const errorHtml = `
+    <div class="ulp-field ulp-error">
+      <div class="ulp-error-info">
+        <span class="ulp-input-error-icon" role="img" aria-label="Error"></span>
+        ${message}
+      </div>
+    </div>
+  `;
+  const html = await getLoginHTML(setan);
+  const responseHtml = html.replace(
+    '<button class="continue-btn" type="submit">Continue</button>',
+    errorHtml + '<button class="continue-btn" type="submit">Continue</button>'
+  );
+  return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
+}
+
 async function getAliveAccountOptions() {
-   const plusAliveAccountString = await KV.get('PlusAliveAccounts') || '';
-   const freeAliveAccountString = await KV.get('FreeAliveAccounts') || '';
-   const aliveAccountString = `${plusAliveAccountString},${freeAliveAccountString}`.replace(/^,|,$/g, '');
-   const aliveAccounts = aliveAccountString
-     .split(',')
-     .map(num => parseInt(num, 10))
-     .filter(num => !isNaN(num));
- 
-   return aliveAccounts.map(num => `<option value="${num}">${num}</option>`).join('');
- }
+  const plusAliveAccountString = await KV.get('PlusAliveAccounts') || '';
+  const freeAliveAccountString = await KV.get('FreeAliveAccounts') || '';
+  const aliveAccountString = `${plusAliveAccountString},${freeAliveAccountString}`.replace(/^,|,$/g, '');
+  const aliveAccounts = aliveAccountString
+    .split(',')
+    .map(num => parseInt(num, 10))
+    .filter(num => !isNaN(num));
+
+  return aliveAccounts.map(num => `<option value="${num}">${num}</option>`).join('');
+}
 
  async function getGPTStatus(){
   const url = 'https://status.openai.com/api/v2/summary.json';
-  
+
 
    // 发送 POST 请求
   const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      },
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    },
   });
   // 检查响应状态
   if (response.ok) {
-      const data = await response.json();
-      const status = data.components.find((component) => component.name === 'ChatGPT');
+    const data = await response.json();
+    const status = data.components.find((component) => component.name === 'ChatGPT');
       //return JSON.stringify(status);
-      return status.status;
- }
+    return status.status;
+  }
  else {return 'operational';}
 }
 
@@ -3229,501 +3267,516 @@ async function getLoginHTML(setan) {
   const websiteName = await KV.get('WebName') || 'Haibara AI';
   const logourl = await KV.get('LogoURL') || logo;
   const removeTurnstile = await KV.get('RemoveTurnstile')||'';
-   const commonHTML = `
-     <!DOCTYPE html>
-     <html lang="en">
-     <head>
-         <meta charset="UTF-8">
-         <link rel="apple-touch-icon" sizes="180x180" href="https://cdn1.oaifree.com/_next/static/media/apple-touch-icon.82af6fe1.png"/>
-         <link rel="icon" type="image/png" sizes="32x32" href="https://cdn4.oaifree.com/_next/static/media/favicon-32x32.630a2b99.png"/>
-         <link rel="icon" type="image/png" sizes="16x16" href="https://cdn4.oaifree.com/_next/static/media/favicon-16x16.a052137e.png"/>
-         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <title>Login - ${websiteName}</title>
-         <style>
-             @charset "UTF-8";
-             .oai-header img {
-                 height: auto;
-                 width: 128px;
-                 margin-top: 50px;
-             }
- 
-             a {
-                 font-weight: 400;
-                 text-decoration: inherit;
-                 color: #10a37f;
-             }
- 
-             .main-container {
-                 flex: 1 0 auto;
-                 min-height: 0;
-                 display: grid;
-                 box-sizing: border-box;
-                 grid-template-rows: [left-start center-start right-start] 1fr [left-end center-end right-end];
-                 grid-template-columns: [left-start center-start] 1fr [left-end right-start] 1fr [center-end right-end];
-                 align-items: center;
-                 justify-content: center;
-                 justify-items: center;
-                 grid-column-gap: 160px;
-                 column-gap: 160px;
-                 padding: 80px;
-                 width: 100%;
-             }
- 
-             .login-container {
-                 background-color: #fff;
-                 padding: 0 40px 40px;
-                 border-radius: 3px;
-                 box-shadow: none;
-                 width: 320px;
-                 box-sizing: content-box;
-                 flex-shrink: 0;
-             }
- 
-             .title-wrapper {
-                 padding: 0 40px 24px;
-                 box-sizing: content-box;
-                 text-align: center;
-             }
- 
-             .title {
-                 font-size: 32px;
-                 font: 'Söhne';
-                 margin: 0;
-                 color: #2d333a;
-                 width: 320px;
-             }
- 
-             .input-wrapper {
-                 position: relative;
-                 margin-bottom: 10px;
-                 width: 320px;
-                 box-sizing: content-box;
-             }
- 
-             .email-input {
-                 -webkit-appearance: none;
-                 -moz-appearance: none;
-                 appearance: none;
-                 background-color: #fff;
-                 border: 1px solid #c2c8d0;
-                 border-radius: 6px;
-                 box-sizing: border-box;
-                 color: #2d333a;
-                 font-family: inherit;
-                 font-size: 16px;
-                 height: 52px;
-                 line-height: 1.1;
-                 outline: none;
-                 padding-block: 1px;
-                 padding-inline: 2px;
-                 padding: 0 16px;
-                 transition:
-                     box-shadow 0.2s ease-in-out,
-                     border-color 0.2s ease-in-out;
-                 width: 100%;
-                 text-rendering: auto;
-                 letter-spacing: normal;
-                 word-spacing: normal;
-                 text-transform: none;
-                 text-indent: 0px;
-                 text-shadow: none;
-                 display: inline-block;
-                 text-align: start;
-                 margin: 0;
-             }
- 
-             .email-input:focus,
-             .email-input:valid {
-                 border: 1px solid #10a37f;
-                 outline: none;
-             }
- 
-             .email-input:focus-within {
-                 box-shadow: 1px #10a37f;
-             }
- 
-             .email-input:focus + .email-label,
-             .email-input:valid + .email-label {
-                 font-size: 14px;
-                 top: 0;
-                 left: 10px;
-                 color: #10a37f;
-                 background-color: #fff;
-             }
- 
-             .email-label {
-                 position: absolute;
-                 top: 26px;
-                 left: 16px;
-                 background-color: #fff;
-                 color: #6f7780;
-                 font-size: 16px;
-                 font-weight: 400;
-                 margin-bottom: 8px;
-                 max-width: 90%;
-                 overflow: hidden;
-                 pointer-events: none;
-                 padding: 1px 6px;
-                 text-overflow: ellipsis;
-                 transform: translateY(-50%);
-                 transform-origin: 0;
-                 transition:
-                     transform 0.15s ease-in-out,
-                     top 0.15s ease-in-out,
-                     padding 0.15s ease-in-out;
-                 white-space: nowrap;
-                 z-index: 1;
-             }
- 
-             .continue-btn {
-                 position: relative;
-                 height: 52px;
-                 width: 320px;
-                 background-color: #10a37f;
-                 color: #fff;
-                 margin: 10px 0 0;
-                 align-items: center;
-                 justify-content: center;
-                 display: flex;
-                 border-radius: 6px;
-                 padding: 4px 16px;
-                 font: inherit;
-                 border-width: 0px;
-                 cursor: pointer;
-             }
- 
-             .continue-btn:hover {
-                 box-shadow: inset 0 0 0 150px #0000001a;
-             }
- 
-             :root {
-                 font-family:
-                     Söhne,
-                     -apple-system,
-                     BlinkMacSystemFont,
-                     Helvetica,
-                     sans-serif;
-                 line-height: 1.5;
-                 font-weight: 400;
-                 font-synthesis: none;
-                 text-rendering: optimizeLegibility;
-                 -webkit-font-smoothing: antialiased;
-                 -moz-osx-font-smoothing: grayscale;
-             }
- 
-             .page-wrapper {
-                 display: flex;
-                 flex-direction: column;
-                 justify-content: space-between;
-                 min-height: 100%;
-             }
- 
-             .oai-header {
-                 display: flex;
-                 justify-content: center;
-                 align-items: center;
-                 width: 100%;
-                 background-color: #fff;
-             }
- 
-             body {
-                 background-color: #fff;
-                 display: block;
-                 margin: 0;
-             }
- 
-             .content-wrapper {
-                 display: flex;
-                 flex-direction: column;
-                 align-items: center;
-                 justify-content: center;
-                 width: 100%;
-                 height: auto;
-                 white-space: normal;
-                 border-radius: 5px;
-                 position: relative;
-                 grid-area: center;
-                 box-shadow: none;
-                 vertical-align: baseline;
-                 box-sizing: content-box;
-             }
- 
-             .checkbox-wrapper {
-                 margin: 20px 0;
-                 display: flex;
-                 align-items: center;
-             }
- 
-             .checkbox-label {
-                 margin-left: 8px;
-                 font-weight: 600;
-                 color: #6f7780;
-                 font-size: 14px;
-             }
- 
-             .help-icon {
-                 display: inline-block;
-                 margin-left: 5px;
-                 color: #10a37f;
-                 cursor: pointer;
-                 font-weight: bold;
-             }
- 
-             .tooltip {
-                 visibility: hidden;
-                 min-width: 140px;
-                 max-width: 300px;
-                 line-height: 20px; 
-                 min-height: 90px; 
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 background-color: black;
-                 color: #fff;
-                 text-align: center;
-                 border-radius: 6px;
-                 
-                 position: absolute;
-                 z-index: 1;
-                 bottom: 150%;
-                 left: 50%;
-                 margin-left: -70px; /* Half of the width to center the tooltip */
-                 opacity: 0;
-                 transition: opacity 0.3s, visibility 0.3s ease-in-out;
-             }
- 
-             .tooltip::after {
-                 content: "";
-                 position: absolute;
-                 top: 100%;
-                 left: 50%;
-                 margin-left: -5px;
-                 border-width: 5px;
-                 border-style: solid;
-                 border-color: black transparent transparent transparent;
-             }
- 
-             .field-container {
-                 display: flex;
-                 margin-bottom: 20px;
-                 width: 320px;
-                 box-sizing: content-box;
-             }
- 
-             .field-container select {
-                 flex: 3;
-                 padding: 12px;
-                 border: 1px solid #c2c8d0;
-                 border-radius: 6px 0 0 6px;
-                 font-size: 16px;
-             }
- 
-             .field-container input[type="number"] {
-                 flex: 1;
-                 padding: 12px;
-                 border: 1px solid #c2c8d0;
-                 border-radius: 0 6px 6px 0;
-                 font-size: 16px;
-             }
- 
-             .cf-turnstile {
-                 display: flex;
-                 justify-content: center;
-                 margin-top: 10px;
-             }
-             .other-page {
-                 text-align: center;
-                 margin-top: 14px;
-                 margin-bottom: 0;
-                 font-size: 14px;
-                 width: 320px;
-                 }
-                 .divider-wrapper {
-                     display: flex;
-                     flex-direction: row;
-                     text-transform: uppercase;
-                     border: none;
+  const commonHTML = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://cdn1.oaifree.com/_next/static/media/apple-touch-icon.82af6fe1.png"/>
+        <link rel="icon" type="image/png" sizes="32x32" href="https://cdn4.oaifree.com/_next/static/media/favicon-32x32.630a2b99.png"/>
+        <link rel="icon" type="image/png" sizes="16x16" href="https://cdn4.oaifree.com/_next/static/media/favicon-16x16.a052137e.png"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login - ${websiteName}</title>
+        <style>
+            @charset "UTF-8";
+            .oai-header img {
+                height: auto;
+                width: 128px;
+                margin-top: 50px;
+            }
+
+            a {
+                font-weight: 400;
+                text-decoration: inherit;
+                color: #10a37f;
+            }
+
+            .main-container {
+                flex: 1 0 auto;
+                min-height: 0;
+                display: grid;
+                box-sizing: border-box;
+                grid-template-rows: [left-start center-start right-start] 1fr [left-end center-end right-end];
+                grid-template-columns: [left-start center-start] 1fr [left-end right-start] 1fr [center-end right-end];
+                align-items: center;
+                justify-content: center;
+                justify-items: center;
+                grid-column-gap: 160px;
+                column-gap: 160px;
+                padding: 80px;
+                width: 100%;
+            }
+
+            .login-container {
+                background-color: #fff;
+                padding: 0 40px 40px;
+                border-radius: 3px;
+                box-shadow: none;
+                width: 320px;
+                box-sizing: content-box;
+                flex-shrink: 0;
+            }
+
+            .title-wrapper {
+                padding: 0 40px 24px;
+                box-sizing: content-box;
+                text-align: center;
+            }
+
+            .title {
+                font-size: 32px;
+                font: 'Söhne';
+                margin: 0;
+                color: #2d333a;
+                width: 320px;
+            }
+
+            .input-wrapper {
+                position: relative;
+                margin-bottom: 10px;
+                width: 320px;
+                box-sizing: content-box;
+            }
+
+            .email-input {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background-color: #fff;
+                border: 1px solid #c2c8d0;
+                border-radius: 6px;
+                box-sizing: border-box;
+                color: #2d333a;
+                font-family: inherit;
+                font-size: 16px;
+                height: 52px;
+                line-height: 1.1;
+                outline: none;
+                padding-block: 1px;
+                padding-inline: 2px;
+                padding: 0 16px;
+                transition:
+                    box-shadow 0.2s ease-in-out,
+                    border-color 0.2s ease-in-out;
+                width: 100%;
+                text-rendering: auto;
+                letter-spacing: normal;
+                word-spacing: normal;
+                text-transform: none;
+                text-indent: 0px;
+                text-shadow: none;
+                display: inline-block;
+                text-align: start;
+                margin: 0;
+            }
+
+            .email-input:focus,
+            .email-input:valid {
+                border: 1px solid #10a37f;
+                outline: none;
+            }
+
+            .email-input:focus-within {
+                box-shadow: 1px #10a37f;
+            }
+
+            .email-input:focus + .email-label,
+            .email-input:valid + .email-label {
+                font-size: 14px;
+                top: 0;
+                left: 10px;
+                color: #10a37f;
+                background-color: #fff;
+            }
+
+            .email-label {
+                position: absolute;
+                top: 26px;
+                left: 16px;
+                background-color: #fff;
+                color: #6f7780;
+                font-size: 16px;
+                font-weight: 400;
+                margin-bottom: 8px;
+                max-width: 90%;
+                overflow: hidden;
+                pointer-events: none;
+                padding: 1px 6px;
+                text-overflow: ellipsis;
+                transform: translateY(-50%);
+                transform-origin: 0;
+                transition:
+                    transform 0.15s ease-in-out,
+                    top 0.15s ease-in-out,
+                    padding 0.15s ease-in-out;
+                white-space: nowrap;
+                z-index: 1;
+            }
+
+            .continue-btn {
+                position: relative;
+                height: 52px;
+                width: 320px;
+                background-color: #10a37f;
+                color: #fff;
+                margin: 10px 0 0;
+                align-items: center;
+                justify-content: center;
+                display: flex;
+                border-radius: 6px;
+                padding: 4px 16px;
+                font: inherit;
+                border-width: 0px;
+                cursor: pointer;
+            }
+
+            .continue-btn:hover {
+                box-shadow: inset 0 0 0 150px #0000001a;
+            }
+
+            :root {
+                font-family:
+                    Söhne,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    Helvetica,
+                    sans-serif;
+                line-height: 1.5;
+                font-weight: 400;
+                font-synthesis: none;
+                text-rendering: optimizeLegibility;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .page-wrapper {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 100%;
+            }
+
+            .oai-header {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                background-color: #fff;
+            }
+
+            body {
+                background-color: #fff;
+                display: block;
+                margin: 0;
+            }
+
+            .content-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: auto;
+                white-space: normal;
+                border-radius: 5px;
+                position: relative;
+                grid-area: center;
+                box-shadow: none;
+                vertical-align: baseline;
+                box-sizing: content-box;
+            }
+
+            .checkbox-wrapper {
+                margin: 20px 0;
+                display: flex;
+                align-items: center;
+            }
+
+            .checkbox-label {
+                margin-left: 8px;
+                font-weight: 600;
+                color: #6f7780;
+                font-size: 14px;
+            }
+
+            .help-icon {
+                display: inline-block;
+                margin-left: 5px;
+                color: #10a37f;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+            .tooltip {
+                visibility: hidden;
+                min-width: 140px;
+                max-width: 300px;
+                line-height: 20px; 
+                min-height: 90px; 
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: black;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                
+                position: absolute;
+                z-index: 1;
+                bottom: 150%;
+                left: 50%;
+                margin-left: -70px; /* Half of the width to center the tooltip */
+                opacity: 0;
+                transition: opacity 0.3s, visibility 0.3s ease-in-out;
+            }
+
+            .tooltip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: black transparent transparent transparent;
+            }
+
+            .field-container {
+                display: flex;
+                margin-bottom: 20px;
+                width: 320px;
+                box-sizing: content-box;
+            }
+
+            .field-container select {
+                flex: 3;
+                padding: 12px;
+                border: 1px solid #c2c8d0;
+                border-radius: 6px 0 0 6px;
+                font-size: 16px;
+            }
+
+            .field-container input[type="number"] {
+                flex: 1;
+                padding: 12px;
+                border: 1px solid #c2c8d0;
+                border-radius: 0 6px 6px 0;
+                font-size: 16px;
+            }
+
+            .cf-turnstile {
+                display: flex;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            .other-page {
+                text-align: center;
+                margin-top: 14px;
+                margin-bottom: 0;
+                font-size: 14px;
+                width: 320px;
+                }
+                .divider-wrapper {
+                    display: flex;
+                    flex-direction: row;
+                    text-transform: uppercase;
+                    border: none;
+                    font-size: 12px;
+                    font-weight: 400;
+                    margin: 0;
+                    padding: 24px 0 0;
+                    align-items: center;
+                    justify-content: center;
+                    width: 320px;
+                    vertical-align: baseline;
+                    }
+                    
+                    .divider-wrapper:before {
+                        content: "";
+                        border-bottom: 1px solid #c2c8d0;
+                        flex: 1 0 auto;
+                        height: .5em;
+                        margin:0
+                    }
+                     .divider-wrapper:after{
+                        content: "";
+                        border-bottom: 1px solid #c2c8d0;
+                        flex: 1 0 auto;
+                        height: .5em;
+                        margin:0
+                    }
+                    .divider {
+                        text-align: center;
+                        flex: .2 0 auto;
+                        margin: 0;
+                        height:12px
+                    }
+                    .checkbox-wrapper {
+                        margin: 0px 0;
+                        display: flex;
+                        align-items: center;
+                    }
+                    .checkbox-label {
+                        margin-left: 8px;
+                        font-weight: 400;
+                        color: #6f7780;
+                        font-size: 14px;
+                    }
+                    .ulp-field.ulp-error .ulp-error-info {
+                      margin-top: 4px;
+                      margin-bottom: 4px;
+                      display: flex;
+                      font-size: 14px;
+                      line-height: 1.4;
+                      text-align: left;
+                      color: #d00e17;
+                  }
+                  
+                  .ulp-input-error-icon {
+                      margin-right: 4px;
+                  }
+                  .ulp-input-error-icon::before {
+                      content: "🚫";
+                      margin-right: 0px;
+                    }
+                    .footer {
+                     text-align: center;
                      font-size: 12px;
-                     font-weight: 400;
-                     margin: 0;
-                     padding: 24px 0 0;
-                     align-items: center;
-                     justify-content: center;
-                     width: 320px;
-                     vertical-align: baseline;
-                     }
-                     
-                     .divider-wrapper:before {
-                         content: "";
-                         border-bottom: 1px solid #c2c8d0;
-                         flex: 1 0 auto;
-                         height: .5em;
-                         margin:0
-                     }
-                      .divider-wrapper:after{
-                         content: "";
-                         border-bottom: 1px solid #c2c8d0;
-                         flex: 1 0 auto;
-                         height: .5em;
-                         margin:0
-                     }
-                     .divider {
-                         text-align: center;
-                         flex: .2 0 auto;
-                         margin: 0;
-                         height:12px
-                     }
-                     .checkbox-wrapper {
-                         margin: 0px 0;
-                         display: flex;
-                         align-items: center;
-                     }
-                     .checkbox-label {
-                         margin-left: 8px;
-                         font-weight: 400;
-                         color: #6f7780;
-                         font-size: 14px;
-                     }
-                     .ulp-field.ulp-error .ulp-error-info {
-                       margin-top: 4px;
-                       margin-bottom: 4px;
-                       display: flex;
-                       font-size: 14px;
-                       line-height: 1.4;
-                       text-align: left;
-                       color: #d00e17;
-                   }
-                   
-                   .ulp-input-error-icon {
-                       margin-right: 4px;
-                   }
-                   .ulp-input-error-icon::before {
-                       content: "🚫";
-                       margin-right: 0px;
-                     }
-                     .footer {
-                      text-align: center;
-                      font-size: 12px;
-                      padding: 10px;
-                  }
-          
-                  .footer a {
-                      color: black;
-                      text-decoration: none;
-                  }
-          
-                  .footer a:hover {
-                      text-decoration: none;
-                      color: black;
-                  }
-      
-             
-         </style>
-     </head>
-     <body>
-         <div id="root">
-             <div class="page-wrapper">
-                 <header class="oai-header">
-                     <a href="https://${WorkerURL}/admin">
-                         <img src="${logourl}" alt="Logo">
-                     </a>
-                 </header>
-                 <main class="main-container">
-                     <section class="content-wrapper">
-                         <div class="title-wrapper"><h1 class="title">${websiteName}</h1></div>
-                         <div class="login-container">
-                             <form id="manageAccountForm0" action="/auth/login_auth0" method="POST">
-                                 <div class="input-wrapper">
-                                     <input
-                                         class="email-input"
-                                         inputmode="email"
-                                         type="text"
-                                         id="un"
-                                         name="un"
-                                         autocomplete="username"
-                                         autocapitalize="none"
-                                         spellcheck="false"
-                                         required
-                                         placeholder=" "
-                                     />
-                                     <label class="email-label" for="un">Username</label>
-                                 </div>`;
- 
-   const aliveAccountOptions = await getAliveAccountOptions();
- 
-   const accountNumberHTML = `
-                                 <div class="input-wrapper">
-                                     <label for="an">
-                                         <a class="username-label" href="https://${WorkerURL}/token">Account Number:</a>
-                                         <span class="help-icon">?</span>
-                                     </label>
-                                     <div class="field-container">
-                                         <select id="an" name="an" class="email-input">
-                                             ${aliveAccountOptions}
-                                         </select>
-                                         <input type="number" id="an-custom" name="an-custom" class="email-input" placeholder="Enter number">
-                                     </div>
-                                 </div>`;
- 
-   const commonHTML2 = `
-                                 <div class="checkbox-wrapper">
-                                     <input type="checkbox" id="an-issues" name="anissues" />
-                                     <label class="checkbox-label" for="an-issues">Report Account Issues</label>
-                                 </div>
-                                 <button class="continue-btn" type="submit">Continue</button>
-                                 <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
-                                 <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
-                             </form>
-                             <div class="divider-wrapper"><span class="divider">Or</span></div>
-                             <p class="other-page">Don't have an account? <a class="other-page-link" href="https://${WorkerURL}/register">Sign Up</a></p>
-                         </div>
-                     </section>
-                 </main>
-             </div>
-         </div>
-         <footer class="footer">
-                <p>&copy; All rights reserved. | Powered by <a href="https://linux.do" target="_blank">Pandora</a> & <a href="https://chatgpt.com" target="_blank">ChatGPT</a></p>
-            </footer>
-            
-         <script>
-         if ('${removeTurnstile}') {
-       document.getElementById('cf-turnstile-response').value= "111";
-      }
-             document.addEventListener('DOMContentLoaded', function() {
-                 const helpIcon = document.querySelector('.help-icon');
-                 const tooltip = document.createElement('div');
-                 tooltip.className = 'tooltip';
-                 tooltip.textContent = 'Select your account. Chat histories are not shared between accounts. Other users cannot view your chat history.';
-                 document.body.appendChild(tooltip);
- 
-                 helpIcon.addEventListener('mouseover', function() {
-                     tooltip.style.visibility = 'visible';
-                     tooltip.style.opacity = '1';
-                     const rect = helpIcon.getBoundingClientRect();
-                     tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
-                     tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
-                 });
- 
-                 helpIcon.addEventListener('mouseout', function() {
-                     tooltip.style.visibility = 'hidden';
-                     tooltip.style.opacity = '0';
-                 });
-             });
- 
-             function onTurnstileCallback(token) {
-                 document.getElementById('cf-turnstile-response').value = token;
-             }
- 
-             document.getElementById('manageAccountForm0').addEventListener('submit', function(event) {
-                 if (!document.getElementById('cf-turnstile-response').value) {
-                     alert('Please complete the verification.');
-                     event.preventDefault();
+                     padding: 10px;
                  }
-             });
-         </script>
-         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-     </body>
-     </html>`;
- 
-   return setan ? commonHTML + commonHTML2 : commonHTML + accountNumberHTML + commonHTML2;
- }
+         
+                 .footer a {
+                     color: black;
+                     text-decoration: none;
+                 }
+         
+                 .footer a:hover {
+                     text-decoration: none;
+                     color: black;
+                 }
+     
+            
+        </style>
+    </head>
+    <body>
+        <div id="root">
+            <div class="page-wrapper">
+                <header class="oai-header">
+                    <a href="https://${WorkerURL}/admin">
+                        <img src="${logourl}" alt="Logo">
+                    </a>
+                </header>
+                <main class="main-container">
+                    <section class="content-wrapper">
+                        <div class="title-wrapper"><h1 class="title">${websiteName}</h1></div>
+                        <div class="login-container">
+                            <form id="manageAccountForm0" action="/auth/login_auth0" method="POST">
+                                <div class="input-wrapper">
+                                    <input
+                                        class="email-input"
+                                        inputmode="email"
+                                        type="text"
+                                        id="un"
+                                        name="un"
+                                        autocomplete="username"
+                                        autocapitalize="none"
+                                        spellcheck="false"
+                                        required
+                                        placeholder=" "
+                                    />
+                                    <label class="email-label" for="un">Username</label>
+                                </div>
+                                <div class="input-wrapper">
+                                    <input
+                                        class="email-input"
+                                        inputmode="text"
+                                        type="password"
+                                        id="pw"
+                                        name="pw"
+                                        autocomplete="current-password"
+                                        autocapitalize="none"
+                                        spellcheck="false"
+                                        required
+                                        placeholder=" "
+                                    />
+                                    <label class="email-label" for="pw">Password</label>
+                                </div>`;
+
+  const aliveAccountOptions = await getAliveAccountOptions();
+
+  const accountNumberHTML = `
+                                <div class="input-wrapper">
+                                    <label for="an">
+                                        <a class="username-label" href="https://${WorkerURL}/token">Account Number:</a>
+                                        <span class="help-icon">?</span>
+                                    </label>
+                                    <div class="field-container">
+                                        <select id="an" name="an" class="email-input">
+                                            ${aliveAccountOptions}
+                                        </select>
+                                        <input type="number" id="an-custom" name="an-custom" class="email-input" placeholder="Enter number">
+                                    </div>
+                                </div>`;
+
+  const commonHTML2 = `
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" id="an-issues" name="anissues" />
+                                    <label class="checkbox-label" for="an-issues">Report Account Issues</label>
+                                </div>
+                                <button class="continue-btn" type="submit">Continue</button>
+                                <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
+                                <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
+                            </form>
+                            <div class="divider-wrapper"><span class="divider">Or</span></div>
+                            <p class="other-page">Don't have an account? <a class="other-page-link" href="https://${WorkerURL}/register">Sign Up</a></p>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+        <footer class="footer">
+               <p>&copy; All rights reserved. | Powered by <a href="https://linux.do" target="_blank">Pandora</a> & <a href="https://chatgpt.com" target="_blank">ChatGPT</a></p>
+           </footer>
+           
+        <script>
+        if ('${removeTurnstile}') {
+      document.getElementById('cf-turnstile-response').value= "111";
+     }
+            document.addEventListener('DOMContentLoaded', function() {
+                const helpIcon = document.querySelector('.help-icon');
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = 'Select your account. Chat histories are not shared between accounts. Other users cannot view your chat history.';
+                document.body.appendChild(tooltip);
+
+                helpIcon.addEventListener('mouseover', function() {
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.opacity = '1';
+                    const rect = helpIcon.getBoundingClientRect();
+                    tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+                    tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+                });
+
+                helpIcon.addEventListener('mouseout', function() {
+                    tooltip.style.visibility = 'hidden';
+                    tooltip.style.opacity = '0';
+                });
+            });
+
+            function onTurnstileCallback(token) {
+                document.getElementById('cf-turnstile-response').value = token;
+            }
+
+            document.getElementById('manageAccountForm0').addEventListener('submit', function(event) {
+                if (!document.getElementById('cf-turnstile-response').value) {
+                    alert('Please complete the verification.');
+                    event.preventDefault();
+                }
+            });
+        </script>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    </body>
+    </html>`;
+
+  return setan ? commonHTML + commonHTML2 : commonHTML + accountNumberHTML + commonHTML2;
+}
