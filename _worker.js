@@ -1677,44 +1677,49 @@ if ('${removeTurnstile}') {
 
 
 
-// Register功能
+//Register功能
 async function handleRegisterPostRequest(request) {
-  const formData = await request.formData()
-  const cdkey = formData.get('cdkey')
-  const username = formData.get('username')
-  const password = formData.get('password')
-  const turnstileResponse = formData.get('cf-turnstile-response')
+  const formData = await request.formData();
+  const cdkey = formData.get('cdkey');
+  const username = formData.get('username');
+  const password = formData.get('password');
+  const turnstileResponse = formData.get('cf-turnstile-response');
 
   if (!await verifyTurnstile(turnstileResponse)) {
-    return generateRegisterResponse('Turnstile verification failed')
+    return generateRegisterResponse('Turnstile verification failed');
   }
 
-  const autoDeleteCDK = await KV.get('AutoDeleteCDK')
+  const autoDeleteCDK = await KV.get('AutoDeleteCDK');
   const cdkeyStore = await KV.get('CDKEY') || '';
-  const cdkeyList = cdkeyStore ? cdkeyStore.split(',') : []
+  const cdkeyList = cdkeyStore ? cdkeyStore.split(',') : [];
 
   if (!cdkeyList.includes(cdkey)) {
-    return generateRegisterResponse('Invalid CDKEY')
+    return generateRegisterResponse('Invalid CDKEY');
   }
   await registerlog(username, cdkey);
-  if (autoDeleteCDK){
-  // Remove used CDKEY and update store
-  const updatedCdkeyList = cdkeyList.filter(key => key !== cdkey)
-  await KV.put('CDKEY', updatedCdkeyList.join(','))
+  if (autoDeleteCDK) {
+    // Remove used CDKEY and update store
+    const updatedCdkeyList = cdkeyList.filter(key => key !== cdkey);
+    await KV.put('CDKEY', updatedCdkeyList.join(','));
   }
 
-  // Add new user to users list with hashed password
-  const users = await KV.get('Users')
-  const usersList = users ? JSON.parse(users) : []
-  if (usersList.some(user => user.username === username)) {
-    return generateRegisterResponse('Username already exists.')
+  // Add new user to freeusers
+  const freeUsers = await KV.get('FreeUsers');
+  const freeUsersList = freeUsers ? freeUsers.split(',') : [];
+  if (freeUsersList.includes(username)) {
+    return generateRegisterResponse('Username already exists.');
   }
+  freeUsersList.push(username);
+  await KV.put('FreeUsers', freeUsersList.join(','));
 
-  const hashedPassword = await hashPassword(password)
-  usersList.push({ username, password: hashedPassword })
-  await KV.put('Users', JSON.stringify(usersList))
+  // Hash the password and store user credentials
+  const hashedPassword = await hashPassword(password);
+  const userCredentials = await KV.get('UserCredentials') || '{}';
+  const credentialsObj = JSON.parse(userCredentials);
+  credentialsObj[username] = hashedPassword;
+  await KV.put('UserCredentials', JSON.stringify(credentialsObj));
 
-  return generateRegisterResponse('Registration successful')
+  return generateRegisterResponse('Registration successful');
 }
 
 async function registerlog(userName, cdkey) {
@@ -2862,7 +2867,7 @@ async function handleLogin(userName, password, initialaccountNumber, turnstileRe
     return generateLoginResponse('Turnstile verification failed');
   }
 
-  const users = await KV.get('Users');
+  const users = await KV.get('userCredentials');
   const usersList = users ? JSON.parse(users) : [];
 
   // 验证用户名和密码
