@@ -2873,15 +2873,19 @@ async function getShareToken(userName, accessToken,accountNumber) {
 
 
 async function handleLogin(userName, password, initialaccountNumber, turnstileResponse, anissues) {
-    //Turnsile认证
-    if (turnstileResponse !== 'do not need Turnstle' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
-    return generateLoginResponse('Turnstile verification failed');
+    // Turnsile认证
+    if (turnstileResponse !== 'do not need Turnstile' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
+        return generateLoginResponse('Turnstile verification failed');
     }
 
     // 初始化 credentials 变量
     const credentials = await KV.get('UserCredentials');
     const credentialsList = credentials ? JSON.parse(credentials) : {};
     const hashedPassword = credentialsList[userName];
+
+    console.log(`Debug: userName=${userName}`);
+    console.log(`Debug: password=${password}`);
+    console.log(`Debug: hashedPassword=${hashedPassword}`);
 
     if (!hashedPassword || !(await verifyPassword(password, hashedPassword))) {
         await loginlog(userName, 'Bad_PW', 'Error');
