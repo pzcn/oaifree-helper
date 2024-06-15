@@ -2800,12 +2800,13 @@ async function handleLoginGetRequest(request) {
 async function handleLoginPostRequest(request) {
     const formData = await request.formData();
     const userName = formData.get('un');
-    const password = formData.get('password');  // 获取密码
+    const password = formData.get('pw');  // 获取密码
     const anissues = formData.get('anissues') === 'on';
     const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
     const turnstileResponse = formData.get('cf-turnstile-response');
     return await handleLogin(userName, password, accountNumber, turnstileResponse, anissues);
 }
+
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
   if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
