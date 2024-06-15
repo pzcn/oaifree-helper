@@ -1673,8 +1673,6 @@ if ('${removeTurnstile}') {
 
 async function verifyPassword(inputPassword, storedHash) {
     const inputHash = await hashPassword(inputPassword);
-    console.log(`Debug: inputHash=${inputHash}`);
-    console.log(`Debug: storedHash=${storedHash}`);
     return inputHash === storedHash;
 }
 
@@ -2211,7 +2209,7 @@ async function getRegisterHTML() {
           </div>
       </div>
       <footer class="footer">
-        <p>&copy; All rights reserved. | Powered by <a href="https://linux.do" target="_blank">Pandora</a> & <a href="https://chatgpt.com" target="_blank">ChatGPT</a></p>
+        <p>&copy; All rights reserved. | Powered by <a href="https://openai.com" target="_blank">OpenAI</a></p>
     </footer>
       <script>
       if ('${removeTurnstile}') {
@@ -2876,10 +2874,6 @@ async function handleLogin(userName, password, initialaccountNumber, turnstileRe
     const credentials = await KV.get('UserCredentials');
     const credentialsList = credentials ? JSON.parse(credentials) : {};
     const hashedPassword = credentialsList[userName];
-
-    console.log(`Debug: userName=${userName}`);
-    console.log(`Debug: password=${password}`);
-    console.log(`Debug: hashedPassword=${hashedPassword}`);
 
     if (!hashedPassword || !(await verifyPassword(password, hashedPassword))) {
         await loginlog(userName, 'Bad_PW', 'Error');
