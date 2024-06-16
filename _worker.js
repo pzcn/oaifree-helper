@@ -2125,15 +2125,20 @@ async function getRegisterHTML() {
       }
 
       .oai-footer {
-      text-align: center;
-      padding: 12px 0 24px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #6e6e80;
-      flex: 0 0 auto
-        }
+          text-align: center;
+          padding: 12px 0 24px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #6e6e80;
+          flex: 0 0 auto
+      }
+      .separator:before {
+          content: " | ";
+          margin: 0 8px
+      }
+
       .footer a {
           color: black;
           text-decoration: none;
@@ -2206,12 +2211,12 @@ async function getRegisterHTML() {
                             </div>
                               <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
                               <button class="continue-btn" type="button" id="continueBtn">Continue</button>
-                                      <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
-                          </form>
-  
+                                  </form>
+
                           <div class="divider-wrapper"><span class="divider">Or</span></div>
                           <p class="other-page">Already have an account? <a class="other-page-link" href="https://${WorkerURL}">Login</a></p>
-                      </div>
+                          <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
+                        </div>
                   </section>
               </main>
           </div>
@@ -3668,6 +3673,12 @@ async function getLoginHTML(setan) {
                       color: #6e6e80;
                       flex: 0 0 auto
                   }
+
+                  .separator:before {
+                      content: " | ";
+                      margin: 0 8px
+                  }
+
                  .footer a {
                      color: black;
                      text-decoration: none;
@@ -3748,11 +3759,11 @@ async function getLoginHTML(setan) {
                                 </div>
                                 <button class="continue-btn" type="submit">Continue</button>
                                  <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
-                                 <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                             </form>
                             <div class="divider-wrapper"><span class="divider">Or</span></div>
                             <p class="other-page">Don't have an account? <a class="other-page-link" href="https://${WorkerURL}/register">Sign Up</a></p>
-                        </div>
+                            <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
+                          </div>
                     </section>
                 </main>
             </div>
