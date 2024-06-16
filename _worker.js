@@ -2124,6 +2124,16 @@ async function getRegisterHTML() {
           padding: 10px;
       }
 
+      .oai-footer {
+      text-align: center;
+      padding: 12px 0 24px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6e6e80;
+      flex: 0 0 auto
+        }
       .footer a {
           color: black;
           text-decoration: none;
@@ -2206,9 +2216,7 @@ async function getRegisterHTML() {
               </main>
           </div>
       </div>
-      <footer class="footer">
-        <p>&copy; All rights reserved. | Powered by <a href="https://openai.com" target="_blank">OpenAI</a></p>
-    </footer>
+      <footer class="oai-footer"><a href="https://openai.com/policies/terms-of-use">Terms of Use</a><span class="separator"></span><a href="https://openai.com/policies/privacy-policy">Privacy Policy</a></footer>
       <script>
       if ('${removeTurnstile}') {
        document.getElementById('cf-turnstile-response').value= "111";
@@ -3650,7 +3658,16 @@ async function getLoginHTML(setan) {
                      font-size: 12px;
                      padding: 10px;
                  }
-         
+                 .oai-footer {
+                      text-align: center;
+                      padding: 12px 0 24px;
+                      font-size: 14px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      color: #6e6e80;
+                      flex: 0 0 auto
+                  }
                  .footer a {
                      color: black;
                      text-decoration: none;
@@ -3740,9 +3757,7 @@ async function getLoginHTML(setan) {
                 </main>
             </div>
         </div>
-        <footer class="footer">
-               <p>&copy; All rights reserved. | Powered by <a href="https://chatgpt.com" target="_blank">OpenAI</a></p>
-           </footer>
+        <footer class="oai-footer"><a href="https://openai.com/policies/terms-of-use">Terms of Use</a><span class="separator"></span><a href="https://openai.com/policies/privacy-policy">Privacy Policy</a></footer>
            
         <script>
         if ('${removeTurnstile}') {
