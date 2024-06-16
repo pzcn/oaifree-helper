@@ -1782,8 +1782,8 @@ async function getRegisterHTML() {
           @charset "UTF-8";
           .oai-header img {
               height: auto;
-              width: 128px;
-              margin-top: 80px;
+              width: 32px;
+              margin-top: 32px;
           }
   
           a {
@@ -3677,7 +3677,7 @@ async function getLoginHTML(setan) {
                 </header>
                 <main class="main-container">
                     <section class="content-wrapper">
-                        <div class="title-wrapper"><h1 class="title">${websiteName}</h1></div>
+                        <div class="title-wrapper"><h1 class="title">Welcome to ChatGPT</h1></div>
                         <div class="login-container">
                             <form id="manageAccountForm0" action="/auth/login_auth0" method="POST">
                                 <div class="input-wrapper">
@@ -3733,18 +3733,18 @@ async function getLoginHTML(setan) {
                                     <label class="checkbox-label" for="an-issues">Report Account Issues</label>
                                 </div>
                                 <button class="continue-btn" type="submit">Continue</button>
-                                <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
-                                <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                             </form>
                             <div class="divider-wrapper"><span class="divider">Or</span></div>
                             <p class="other-page">Don't have an account? <a class="other-page-link" href="https://${WorkerURL}/register">Sign Up</a></p>
+                                <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
+                                <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                         </div>
                     </section>
                 </main>
             </div>
         </div>
         <footer class="footer">
-               <p>&copy; All rights reserved. | Powered by <a href="https://linux.do" target="_blank">Pandora</a> & <a href="https://chatgpt.com" target="_blank">ChatGPT</a></p>
+               <p>&copy; All rights reserved. | Powered by a href="https://chatgpt.com" target="_blank">OpenAI</a></p>
            </footer>
            
         <script>
