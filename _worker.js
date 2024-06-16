@@ -217,7 +217,7 @@ if (cookies) {
 
  
   // for oaifree
-  if (url.pathname === '/auth/login') {
+  if (url.pathname === '/auth/login_auth0') {
     if (request.method === 'GET') {
       return handleLoginGetRequest(request);
     } else if (request.method === 'POST') {
