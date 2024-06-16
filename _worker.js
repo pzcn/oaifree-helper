@@ -1825,7 +1825,6 @@ async function getRegisterHTML() {
           }
   
           .title {
-              font-size: 32px;
               font: 'Söhne';
               margin: 0;
               color: #2d333a;
@@ -3290,8 +3289,8 @@ async function getLoginHTML(setan) {
             @charset "UTF-8";
             .oai-header img {
                 height: auto;
-                width: 128px;
-                margin-top: 50px;
+                width: 32px;
+                margin-top: 32px;
             }
 
             a {
@@ -3333,7 +3332,6 @@ async function getLoginHTML(setan) {
             }
 
             .title {
-                font-size: 32px;
                 font: 'Söhne';
                 margin: 0;
                 color: #2d333a;
@@ -3744,7 +3742,7 @@ async function getLoginHTML(setan) {
             </div>
         </div>
         <footer class="footer">
-               <p>&copy; All rights reserved. | Powered by a href="https://chatgpt.com" target="_blank">OpenAI</a></p>
+               <p>&copy; All rights reserved. | Powered by <a href="https://chatgpt.com" target="_blank">OpenAI</a></p>
            </footer>
            
         <script>
