@@ -2197,11 +2197,11 @@ async function getRegisterHTML() {
                             </div>
                               <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
                               <button class="continue-btn" type="button" id="continueBtn">Continue</button>
+                                      <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                           </form>
   
                           <div class="divider-wrapper"><span class="divider">Or</span></div>
                           <p class="other-page">Already have an account? <a class="other-page-link" href="https://${WorkerURL}">Login</a></p>
-                              <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                       </div>
                   </section>
               </main>
@@ -3731,11 +3731,11 @@ async function getLoginHTML(setan) {
                                     <label class="checkbox-label" for="an-issues">Report Account Issues</label>
                                 </div>
                                 <button class="continue-btn" type="submit">Continue</button>
+                                 <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
+                                 <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                             </form>
                             <div class="divider-wrapper"><span class="divider">Or</span></div>
                             <p class="other-page">Don't have an account? <a class="other-page-link" href="https://${WorkerURL}/register">Sign Up</a></p>
-                                <input type="hidden" id="cf-turnstile-response" name="cf-turnstile-response" required>
-                                <div class="cf-turnstile" data-sitekey="${turnstileSiteKey}" data-callback="onTurnstileCallback"></div>
                         </div>
                     </section>
                 </main>
