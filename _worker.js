@@ -1,67 +1,66 @@
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
- // @ts-ignore
- const KV =oai_global_variables;
- const logo = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDEiIGhlaWdodD0iNDEiIHZpZXdCb3g9IjAgMCA0MSA0MSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxwYXRoIGQ9Ik0zNy41MzI0IDE2Ljg3MDdDMzcuOTgwOCAxNS41MjQxIDM4LjEzNjMgMTQuMDk3NCAzNy45ODg2IDEyLjY4NTlDMzcuODQwOSAxMS4yNzQ0IDM3LjM5MzQgOS45MTA3NiAzNi42NzYgOC42ODYyMkMzNS42MTI2IDYuODM0MDQgMzMuOTg4MiA1LjM2NzYgMzIuMDM3MyA0LjQ5ODVDMzAuMDg2NCAzLjYyOTQxIDI3LjkwOTggMy40MDI1OSAyNS44MjE1IDMuODUwNzhDMjQuODc5NiAyLjc4OTMgMjMuNzIxOSAxLjk0MTI1IDIyLjQyNTcgMS4zNjM0MUMyMS4xMjk1IDAuNzg1NTc1IDE5LjcyNDkgMC40OTEyNjkgMTguMzA1OCAwLjUwMDE5N0MxNi4xNzA4IDAuNDk1MDQ0IDE0LjA4OTMgMS4xNjgwMyAxMi4zNjE0IDIuNDIyMTRDMTAuNjMzNSAzLjY3NjI0IDkuMzQ4NTMgNS40NDY2NiA4LjY5MTcgNy40NzgxNUM3LjMwMDg1IDcuNzYyODYgNS45ODY4NiA4LjM0MTQgNC44Mzc3IDkuMTc1MDVDMy42ODg1NCAxMC4wMDg3IDIuNzMwNzMgMTEuMDc4MiAyLjAyODM5IDEyLjMxMkMwLjk1NjQ2NCAxNC4xNTkxIDAuNDk4OTA1IDE2LjI5ODggMC43MjE2OTggMTguNDIyOEMwLjk0NDQ5MiAyMC41NDY3IDEuODM2MTIgMjIuNTQ0OSAzLjI2OCAyNC4xMjkzQzIuODE5NjYgMjUuNDc1OSAyLjY2NDEzIDI2LjkwMjYgMi44MTE4MiAyOC4zMTQxQzIuOTU5NTEgMjkuNzI1NiAzLjQwNzAxIDMxLjA4OTIgNC4xMjQzNyAzMi4zMTM4QzUuMTg3OTEgMzQuMTY1OSA2LjgxMjMgMzUuNjMyMiA4Ljc2MzIxIDM2LjUwMTNDMTAuNzE0MSAzNy4zNzA0IDEyLjg5MDcgMzcuNTk3MyAxNC45Nzg5IDM3LjE0OTJDMTUuOTIwOCAzOC4yMTA3IDE3LjA3ODYgMzkuMDU4NyAxOC4zNzQ3IDM5LjYzNjZDMTkuNjcwOSA0MC4yMTQ0IDIxLjA3NTUgNDAuNTA4NyAyMi40OTQ2IDQwLjQ5OThDMjQuNjMwNyA0MC41MDU0IDI2LjcxMzMgMzkuODMyMSAyOC40NDE4IDM4LjU3NzJDMzAuMTcwNCAzNy4zMjIzIDMxLjQ1NTYgMzUuNTUwNiAzMi4xMTE5IDMzLjUxNzlDMzMuNTAyNyAzMy4yMzMyIDM0LjgxNjcgMzIuNjU0NyAzNS45NjU5IDMxLjgyMUMzNy4xMTUgMzAuOTg3NCAzOC4wNzI4IDI5LjkxNzggMzguNzc1MiAyOC42ODRDMzkuODQ1OCAyNi44MzcxIDQwLjMwMjMgMjQuNjk3OSA0MC4wNzg5IDIyLjU3NDhDMzkuODU1NiAyMC40NTE3IDM4Ljk2MzkgMTguNDU0NCAzNy41MzI0IDE2Ljg3MDdaTTIyLjQ5NzggMzcuODg0OUMyMC43NDQzIDM3Ljg4NzQgMTkuMDQ1OSAzNy4yNzMzIDE3LjY5OTQgMzYuMTUwMUMxNy43NjAxIDM2LjExNyAxNy44NjY2IDM2LjA1ODYgMTcuOTM2IDM2LjAxNjFMMjUuOTAwNCAzMS40MTU2QzI2LjEwMDMgMzEuMzAxOSAyNi4yNjYzIDMxLjEzNyAyNi4zODEzIDMwLjkzNzhDMjYuNDk2NCAzMC43Mzg2IDI2LjU1NjMgMzAuNTEyNCAyNi41NTQ5IDMwLjI4MjVWMTkuMDU0MkwyOS45MjEzIDIwLjk5OEMyOS45Mzg5IDIxLjAwNjggMjkuOTU0MSAyMS4wMTk4IDI5Ljk2NTYgMjEuMDM1OUMyOS45NzcgMjEuMDUyIDI5Ljk4NDIgMjEuMDcwNyAyOS45ODY3IDIxLjA5MDJWMzAuMzg4OUMyOS45ODQyIDMyLjM3NSAyOS4xOTQ2IDM0LjI3OTEgMjcuNzkwOSAzNS42ODQxQzI2LjM4NzIgMzcuMDg5MiAyNC40ODM4IDM3Ljg4MDYgMjIuNDk3OCAzNy44ODQ5Wk02LjM5MjI3IDMxLjAwNjRDNS41MTM5NyAyOS40ODg4IDUuMTk3NDIgMjcuNzEwNyA1LjQ5ODA0IDI1Ljk4MzJDNS41NTcxOCAyNi4wMTg3IDUuNjYwNDggMjYuMDgxOCA1LjczNDYxIDI2LjEyNDRMMTMuNjk5IDMwLjcyNDhDMTMuODk3NSAzMC44NDA4IDE0LjEyMzMgMzAuOTAyIDE0LjM1MzIgMzAuOTAyQzE0LjU4MyAzMC45MDIgMTQuODA4OCAzMC44NDA4IDE1LjAwNzMgMzAuNzI0OEwyNC43MzEgMjUuMTEwM1YyOC45OTc5QzI0LjczMjEgMjkuMDE3NyAyNC43MjgzIDI5LjAzNzYgMjQuNzE5OSAyOS4wNTU2QzI0LjcxMTUgMjkuMDczNiAyNC42OTg4IDI5LjA4OTMgMjQuNjgyOSAyOS4xMDEyTDE2LjYzMTcgMzMuNzQ5N0MxNC45MDk2IDM0Ljc0MTYgMTIuODY0MyAzNS4wMDk3IDEwLjk0NDcgMzQuNDk1NEM5LjAyNTA2IDMzLjk4MTEgNy4zODc4NSAzMi43MjYzIDYuMzkyMjcgMzEuMDA2NFpNNC4yOTcwNyAxMy42MTk0QzUuMTcxNTYgMTIuMDk5OCA2LjU1Mjc5IDEwLjkzNjQgOC4xOTg4NSAxMC4zMzI3QzguMTk4ODUgMTAuNDAxMyA4LjE5NDkxIDEwLjUyMjggOC4xOTQ5MSAxMC42MDcxVjE5LjgwOEM4LjE5MzUxIDIwLjAzNzggOC4yNTMzNCAyMC4yNjM4IDguMzY4MjMgMjAuNDYyOUM4LjQ4MzEyIDIwLjY2MTkgOC42NDg5MyAyMC44MjY3IDguODQ4NjMgMjAuOTQwNEwxOC41NzIzIDI2LjU1NDJMMTUuMjA2IDI4LjQ5NzlDMTUuMTg5NCAyOC41MDg5IDE1LjE3MDMgMjguNTE1NSAxNS4xNTA1IDI4LjUxNzNDMTUuMTMwNyAyOC41MTkxIDE1LjExMDcgMjguNTE2IDE1LjA5MjQgMjguNTA4Mkw3LjA0MDQ2IDIzLjg1NTdDNS4zMjEzNSAyMi44NjAxIDQuMDY3MTYgMjEuMjIzNSAzLjU1Mjg5IDE5LjMwNDZDMy4wMzg2MiAxNy4zODU4IDMuMzA2MjQgMTUuMzQxMyA0LjI5NzA3IDEzLjYxOTRaTTMxLjk1NSAyMC4wNTU2TDIyLjIzMTIgMTQuNDQxMUwyNS41OTc2IDEyLjQ5ODFDMjUuNjE0MiAxMi40ODcyIDI1LjYzMzMgMTIuNDgwNSAyNS42NTMxIDEyLjQ3ODdDMjUuNjcyOSAxMi40NzY5IDI1LjY5MjggMTIuNDgwMSAyNS43MTExIDEyLjQ4NzlMMzMuNzYzMSAxNy4xMzY0QzM0Ljk5NjcgMTcuODQ5IDM2LjAwMTcgMTguODk4MiAzNi42NjA2IDIwLjE2MTNDMzcuMzE5NCAyMS40MjQ0IDM3LjYwNDcgMjIuODQ5IDM3LjQ4MzIgMjQuMjY4NEMzNy4zNjE3IDI1LjY4NzggMzYuODM4MiAyNy4wNDMyIDM1Ljk3NDMgMjguMTc1OUMzNS4xMTAzIDI5LjMwODYgMzMuOTQxNSAzMC4xNzE3IDMyLjYwNDcgMzAuNjY0MUMzMi42MDQ3IDMwLjU5NDcgMzIuNjA0NyAzMC40NzMzIDMyLjYwNDcgMzAuMzg4OVYyMS4xODhDMzIuNjA2NiAyMC45NTg2IDMyLjU0NzQgMjAuNzMyOCAzMi40MzMyIDIwLjUzMzhDMzIuMzE5IDIwLjMzNDggMzIuMTU0IDIwLjE2OTggMzEuOTU1IDIwLjA1NTZaTTM1LjMwNTUgMTUuMDEyOEMzNS4yNDY0IDE0Ljk3NjUgMzUuMTQzMSAxNC45MTQyIDM1LjA2OSAxNC44NzE3TDI3LjEwNDUgMTAuMjcxMkMyNi45MDYgMTAuMTU1NCAyNi42ODAzIDEwLjA5NDMgMjYuNDUwNCAxMC4wOTQzQzI2LjIyMDYgMTAuMDk0MyAyNS45OTQ4IDEwLjE1NTQgMjUuNzk2MyAxMC4yNzEyTDE2LjA3MjYgMTUuODg1OFYxMS45OTgyQzE2LjA3MTUgMTEuOTc4MyAxNi4wNzUzIDExLjk1ODUgMTYuMDgzNyAxMS45NDA1QzE2LjA5MjEgMTEuOTIyNSAxNi4xMDQ4IDExLjkwNjggMTYuMTIwNyAxMS44OTQ5TDI0LjE3MTkgNy4yNTAyNUMyNS40MDUzIDYuNTM5MDMgMjYuODE1OCA2LjE5Mzc2IDI4LjIzODMgNi4yNTQ4MkMyOS42NjA4IDYuMzE1ODkgMzEuMDM2NCA2Ljc4MDc3IDMyLjIwNDQgNy41OTUwOEMzMy4zNzIzIDguNDA5MzkgMzQuMjg0MiA5LjUzOTQ1IDM0LjgzMzQgMTAuODUzMUMzNS4zODI2IDEyLjE2NjcgMzUuNTQ2NCAxMy42MDk1IDM1LjMwNTUgMTUuMDEyOFpNMTQuMjQyNCAyMS45NDE5TDEwLjg3NTIgMTkuOTk4MUMxMC44NTc2IDE5Ljk4OTMgMTAuODQyMyAxOS45NzYzIDEwLjgzMDkgMTkuOTYwMkMxMC44MTk1IDE5Ljk0NDEgMTAuODEyMiAxOS45MjU0IDEwLjgwOTggMTkuOTA1OFYxMC42MDcxQzEwLjgxMDcgOS4xODI5NSAxMS4yMTczIDcuNzg4NDggMTEuOTgxOSA2LjU4Njk2QzEyLjc0NjYgNS4zODU0NCAxMy44Mzc3IDQuNDI2NTkgMTUuMTI3NSAzLjgyMjY0QzE2LjQxNzMgMy4yMTg2OSAxNy44NTI0IDIuOTk0NjQgMTkuMjY0OSAzLjE3NjdDMjAuNjc3NSAzLjM1ODc2IDIyLjAwODkgMy45Mzk0MSAyMy4xMDM0IDQuODUwNjdDMjMuMDQyNyA0Ljg4Mzc5IDIyLjkzNyA0Ljk0MjE1IDIyLjg2NjggNC45ODQ3M0wxNC45MDI0IDkuNTg1MTdDMTQuNzAyNSA5LjY5ODc4IDE0LjUzNjYgOS44NjM1NiAxNC40MjE1IDEwLjA2MjZDMTQuMzA2NSAxMC4yNjE2IDE0LjI0NjYgMTAuNDg3NyAxNC4yNDc5IDEwLjcxNzVMMTQuMjQyNCAyMS45NDE5Wk0xNi4wNzEgMTcuOTk5MUwyMC40MDE4IDE1LjQ5NzhMMjQuNzMyNSAxNy45OTc1VjIyLjk5ODVMMjAuNDAxOCAyNS40OTgzTDE2LjA3MSAyMi45OTg1VjE3Ljk5OTFaIgogICAgZmlsbD0iY3VycmVudENvbG9yIi8+Cjwvc3ZnPgo=';
- 
- //通用函数
+// @ts-ignore
+const KV = oai_global_variables;
+const logo = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDEiIGhlaWdodD0iNDEiIHZpZXdCb3g9IjAgMCA0MSA0MSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxwYXRoIGQ9Ik0zNy41MzI0IDE2Ljg3MDdDMzcuOTgwOCAxNS41MjQxIDM4LjEzNjMgMTQuMDk3NCAzNy45ODg2IDEyLjY4NTlDMzcuODQwOSAxMS4yNzQ0IDM3LjM5MzQgOS45MTA3NiAzNi42NzYgOC42ODYyMkMzNS42MTI2IDYuODM0MDQgMzMuOTg4MiA1LjM2NzYgMzIuMDM3MyA0LjQ5ODVDMzAuMDg2NCAzLjYyOTQxIDI3LjkwOTggMy40MDI1OSAyNS44MjE1IDMuODUwNzhDMjQuODc5NiAyLjc4OTMgMjMuNzIxOSAxLjk0MTI1IDIyLjQyNTcgMS4zNjM0MUMyMS4xMjk1IDAuNzg1NTc1IDE5LjcyNDkgMC40OTEyNjkgMTguMzA1OCAwLjUwMDE5N0MxNi4xNzA4IDAuNDk1MDQ0IDE0LjA4OTMgMS4xNjgwMyAxMi4zNjE0IDIuNDIyMTRDMTAuNjMzNSAzLjY3NjI0IDkuMzQ4NTMgNS40NDY2NiA4LjY5MTcgNy40NzgxNUM3LjMwMDg1IDcuNzYyODYgNS45ODY4NiA4LjM0MTQgNC44Mzc3IDkuMTc1MDVDMy42ODg1NCAxMC4wMDg3IDIuNzMwNzMgMTEuMDc4MiAyLjAyODM5IDEyLjMxMkMwLjk1NjQ2NCAxNC4xNTkxIDAuNDk4OTA1IDE2LjI5ODggMC43MjE2OTggMTguNDIyOEMwLjk0NDQ5MiAyMC41NDY3IDEuODM2MTIgMjIuNTQ0OSAzLjI2OCAyNC4xMjkzQzIuODE5NjYgMjUuNDc1OSAyLjY2NDEzIDI2LjkwMjYgMi44MTE4MiAyOC4zMTQxQzIuOTU5NTEgMjkuNzI1NiAzLjQwNzAxIDMxLjA4OTIgNC4xMjQzNyAzMi4zMTM4QzUuMTg3OTEgMzQuMTY1OSA2LjgxMjMgMzUuNjMyMiA4Ljc2MzIxIDM2LjUwMTNDMTAuNzE0MSAzNy4zNzA0IDEyLjg5MDcgMzcuNTk3MyAxNC45Nzg5IDM3LjE0OTJDMTUuOTIwOCAzOC4yMTA3IDE3LjA3ODYgMzkuMDU4NyAxOC4zNzQ3IDM5LjYzNjZDMTkuNjcwOSA0MC4yMTQ0IDIxLjA3NTUgNDAuNTA4NyAyMi40OTQ2IDQwLjQ5OThDMjQuNjMwNyA0MC41MDU0IDI2LjcxMzMgMzkuODMyMSAyOC40NDE4IDM4LjU3NzJDMzAuMTcwNCAzNy4zMjIzIDMxLjQ1NTYgMzUuNTUwNiAzMi4xMTE5IDMzLjUxNzlDMzMuNTAyNyAzMy4yMzMyIDM0LjgxNjcgMzIuNjU0NyAzNS45NjU5IDMxLjgyMUMzNy4xMTUgMzAuOTg3NCAzOC4wNzI4IDI5LjkxNzggMzguNzc1MiAyOC42ODRDMzkuODQ1OCAyNi44MzcxIDQwLjMwMjMgMjQuNjk3OSA0MC4wNzg5IDIyLjU3NDhDMzkuODU1NiAyMC40NTE3IDM4Ljk2MzkgMTguNDU0NCAzNy41MzI0IDE2Ljg3MDdaTTIyLjQ5NzggMzcuODg0OUMyMC43NDQzIDM3Ljg4NzQgMTkuMDQ1OSAzNy4yNzMzIDE3LjY5OTQgMzYuMTUwMUMxNy43NjAxIDM2LjExNyAxNy44NjY2IDM2LjA1ODYgMTcuOTM2IDM2LjAxNjFMMjUuOTAwNCAzMS40MTU2QzI2LjEwMDMgMzEuMzAxOSAyNi4yNjYzIDMxLjEzNyAyNi4zODEzIDMwLjkzNzhDMjYuNDk2NCAzMC43Mzg2IDI2LjU1NjMgMzAuNTEyNCAyNi41NTQ5IDMwLjI4MjVWMTkuMDU0MkwyOS45MjEzIDIwLjk5OEMyOS45Mzg5IDIxLjAwNjggMjkuOTU0MSAyMS4wMTk4IDI5Ljk2NTYgMjEuMDM1OUMyOS45NzcgMjEuMDUyIDI5Ljk4NDIgMjEuMDcwNyAyOS45ODY3IDIxLjA5MDJWMzAuMzg4OUMyOS45ODQyIDMyLjM3NSAyOS4xOTQ2IDM0LjI3OTEgMjcuNzkwOSAzNS42ODQxQzI2LjM4NzIgMzcuMDg5MiAyNC40ODM4IDM3Ljg4MDYgMjIuNDk3OCAzNy44ODQ5Wk02LjM5MjI3IDMxLjAwNjRDNS41MTM5NyAyOS40ODg4IDUuMTk3NDIgMjcuNzEwNyA1LjQ5ODA0IDI1Ljk4MzJDNS41NTcxOCAyNi4wMTg3IDUuNjYwNDggMjYuMDgxOCA1LjczNDYxIDI2LjEyNDRMMTMuNjk5IDMwLjcyNDhDMTMuODk3NSAzMC44NDA4IDE0LjEyMzMgMzAuOTAyIDE0LjM1MzIgMzAuOTAyQzE0LjU4MyAzMC45MDIgMTQuODA4OCAzMC44NDA4IDE1LjAwNzMgMzAuNzI0OEwyNC43MzEgMjUuMTEwM1YyOC45OTc5QzI0LjczMjEgMjkuMDE3NyAyNC43MjgzIDI5LjAzNzYgMjQuNzE5OSAyOS4wNTU2QzI0LjcxMTUgMjkuMDczNiAyNC42OTg4IDI5LjA4OTMgMjQuNjgyOSAyOS4xMDEyTDE2LjYzMTcgMzMuNzQ5N0MxNC45MDk2IDM0Ljc0MTYgMTIuODY0MyAzNS4wMDk3IDEwLjk0NDcgMzQuNDk1NEM5LjAyNTA2IDMzLjk4MTEgNy4zODc4NSAzMi43MjYzIDYuMzkyMjcgMzEuMDA2NFpNNC4yOTcwNyAxMy42MTk0QzUuMTcxNTYgMTIuMDk5OCA2LjU1Mjc5IDEwLjkzNjQgOC4xOTg4NSAxMC4zMzI3QzguMTk4ODUgMTAuNDAxMyA4LjE5NDkxIDEwLjUyMjggOC4xOTQ5MSAxMC42MDcxVjE5LjgwOEM4LjE5MzUxIDIwLjAzNzggOC4yNTMzNCAyMC4yNjM4IDguMzY4MjMgMjAuNDYyOUM4LjQ4MzEyIDIwLjY2MTkgOC42NDg5MyAyMC44MjY3IDguODQ4NjMgMjAuOTQwNEwxOC41NzIzIDI2LjU1NDJMMTUuMjA2IDI4LjQ5NzlDMTUuMTg5NCAyOC41MDg5IDE1LjE3MDMgMjguNTE1NSAxNS4xNTA1IDI4LjUxNzNDMTUuMTMwNyAyOC41MTkxIDE1LjExMDcgMjguNTE2IDE1LjA5MjQgMjguNTA4Mkw3LjA0MDQ2IDIzLjg1NTdDNS4zMjEzNSAyMi44NjAxIDQuMDY3MTYgMjEuMjIzNSAzLjU1Mjg5IDE5LjMwNDZDMy4wMzg2MiAxNy4zODU4IDMuMzA2MjQgMTUuMzQxMyA0LjI5NzA3IDEzLjYxOTRaTTMxLjk1NSAyMC4wNTU2TDIyLjIzMTIgMTQuNDQxMUwyNS41OTc2IDEyLjQ5ODFDMjUuNjE0MiAxMi40ODcyIDI1LjYzMzMgMTIuNDgwNSAyNS42NTMxIDEyLjQ3ODdDMjUuNjcyOSAxMi40NzY5IDI1LjY5MjggMTIuNDgwMSAyNS43MTExIDEyLjQ4NzlMMzMuNzYzMSAxNy4xMzY0QzM0Ljk5NjcgMTcuODQ5IDM2LjAwMTcgMTguODk4MiAzNi42NjA2IDIwLjE2MTNDMzcuMzE5NCAyMS40MjQ0IDM3LjYwNDcgMjIuODQ5IDM3LjQ4MzIgMjQuMjY4NEMzNy4zNjE3IDI1LjY4NzggMzYuODM4MiAyNy4wNDMyIDM1Ljk3NDMgMjguMTc1OUMzNS4xMTAzIDI5LjMwODYgMzMuOTQxNSAzMC4xNzE3IDMyLjYwNDcgMzAuNjY0MUMzMi42MDQ3IDMwLjU5NDcgMzIuNjA0NyAzMC40NzMzIDMyLjYwNDcgMzAuMzg4OVYyMS4xODhDMzIuNjA2NiAyMC45NTg2IDMyLjU0NzQgMjAuNzMyOCAzMi40MzMyIDIwLjUzMzhDMzIuMzE5IDIwLjMzNDggMzIuMTU0IDIwLjE2OTggMzEuOTU1IDIwLjA1NTZaTTM1LjMwNTUgMTUuMDEyOEMzNS4yNDY0IDE0Ljk3NjUgMzUuMTQzMSAxNC45MTQyIDM1LjA2OSAxNC44NzE3TDI3LjEwNDUgMTAuMjcxMkMyNi45MDYgMTAuMTU1NCAyNi42ODAzIDEwLjA5NDMgMjYuNDUwNCAxMC4wOTQzQzI2LjIyMDYgMTAuMDk0MyAyNS45OTQ4IDEwLjE1NTQgMjUuNzk2MyAxMC4yNzEyTDE2LjA3MjYgMTUuODg1OFYxMS45OTgyQzE2LjA3MTUgMTEuOTc4MyAxNi4wNzUzIDExLjk1ODUgMTYuMDgzNyAxMS45NDA1QzE2LjA5MjEgMTEuOTIyNSAxNi4xMDQ4IDExLjkwNjggMTYuMTIwNyAxMS44OTQ5TDI0LjE3MTkgNy4yNTAyNUMyNS40MDUzIDYuNTM5MDMgMjYuODE1OCA2LjE5Mzc2IDI4LjIzODMgNi4yNTQ4MkMyOS42NjA4IDYuMzE1ODkgMzEuMDM2NCA2Ljc4MDc3IDMyLjIwNDQgNy41OTUwOEMzMy4zNzIzIDguNDA5MzkgMzQuMjg0MiA5LjUzOTQ1IDM0LjgzMzQgMTAuODUzMUMzNS4zODI2IDEyLjE2NjcgMzUuNTQ2NCAxMy42MDk1IDM1LjMwNTUgMTUuMDEyOFpNMTQuMjQyNCAyMS45NDE5TDEwLjg3NTIgMTkuOTk4MUMxMC44NTc2IDE5Ljk4OTMgMTAuODQyMyAxOS45NzYzIDEwLjgzMDkgMTkuOTYwMkMxMC44MTk1IDE5Ljk0NDEgMTAuODEyMiAxOS45MjU0IDEwLjgwOTggMTkuOTA1OFYxMC42MDcxQzEwLjgxMDcgOS4xODI5NSAxMS4yMTczIDcuNzg4NDggMTEuOTgxOSA2LjU4Njk2QzEyLjc0NjYgNS4zODU0NCAxMy44Mzc3IDQuNDI2NTkgMTUuMTI3NSAzLjgyMjY0QzE2LjQxNzMgMy4yMTg2OSAxNy44NTI0IDIuOTk0NjQgMTkuMjY0OSAzLjE3NjdDMjAuNjc3NSAzLjM1ODc2IDIyLjAwODkgMy45Mzk0MSAyMy4xMDM0IDQuODUwNjdDMjMuMDQyNyA0Ljg4Mzc5IDIyLjkzNyA0Ljk0MjE1IDIyLjg2NjggNC45ODQ3M0wxNC45MDI0IDkuNTg1MTdDMTQuNzAyNSA5LjY5ODc4IDE0LjUzNjYgOS44NjM1NiAxNC40MjE1IDEwLjA2MjZDMTQuMzA2NSAxMC4yNjE2IDE0LjI0NjYgMTAuNDg3NyAxNC4yNDc5IDEwLjcxNzVMMTQuMjQyNCAyMS45NDE5Wk0xNi4wNzEgMTcuOTk5MUwyMC40MDE4IDE1LjQ5NzhMMjQuNzMyNSAxNy45OTc1VjIyLjk5ODVMMjAuNDAxOCAyNS40OTgzTDE2LjA3MSAyMi45OTg1VjE3Ljk5OTFaIgogICAgZmlsbD0iY3VycmVudENvbG9yIi8+Cjwvc3ZnPgo=';
+
+//通用函数
 
 
- function parseJwt(token) {
+function parseJwt(token) {
   const base64Url = token.split('.')[1];// 获取载荷部分
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
   const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
   }).join(''));
   return JSON.parse(jsonPayload);// 返回载荷解析后的 JSON 对象
 }
 
 //刷新AT
-async function refreshAT(tochecktoken,an) {
+async function refreshAT(tochecktoken, an) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true  
   const accessTokenKey = `at_${an}`;
-const token = tochecktoken || await KV.get(accessTokenKey) ||'';
-if (token && token !== "Bad_RT" && token !== "Old_AT")
-{
- const payload = parseJwt(token);
-const currentTime = Math.floor(Date.now() / 1000);// 获取当前时间戳（秒）
-if (payload.exp > currentTime ){
-  return token
-}
-}
+  const token = tochecktoken || await KV.get(accessTokenKey) || '';
+  if (token && token !== "Bad_RT" && token !== "Old_AT") {
+    const payload = parseJwt(token);
+    const currentTime = Math.floor(Date.now() / 1000);// 获取当前时间戳（秒）
+    if (payload.exp > currentTime) {
+      return token
+    }
+  }
   const refreshTokenKey = `rt_${an}`;
   const url = 'https://token.oaifree.com/api/auth/refresh';
- const refreshToken = await KV.get(refreshTokenKey);
- if (refreshToken) {
-  // 发送 POST 请求
- const response = await fetch(url, {
-     method: 'POST',
-     headers: {
-         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-     },
-     body: `refresh_token=${refreshToken}`
- });
+  const refreshToken = await KV.get(refreshTokenKey);
+  if (refreshToken) {
+    // 发送 POST 请求
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: `refresh_token=${refreshToken}`
+    });
 
- // 检查响应状态
-   if (response.ok) {
-     const data = await response.json();
-     const newAccessToken = data.access_token;
-     await KV.put(accessTokenKey, newAccessToken);
-     return newAccessToken;
-     } else {
-     await KV.put(accessTokenKey, "Bad_RT");
-     return '';
-      }
-} 
-else {
-  await KV.put(accessTokenKey, "Old_AT");
-  return '';
+    // 检查响应状态
+    if (response.ok) {
+      const data = await response.json();
+      const newAccessToken = data.access_token;
+      await KV.put(accessTokenKey, newAccessToken);
+      return newAccessToken;
+    } else {
+      await KV.put(accessTokenKey, "Bad_RT");
+      return '';
+    }
+  }
+  else {
+    await KV.put(accessTokenKey, "Old_AT");
+    return '';
+  }
 }
-}
 
 
-    // 使用哈希函数加密username
+// 使用哈希函数加密username
 function generatePassword(token) {
   let hash = 7
   for (let i = 0; i < token.length; i++) {
@@ -81,8 +80,8 @@ function generatePassword(token) {
   return hashStr.substring(0, 15)
 }
 async function verifyTurnstile(responseToken) {
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
-  if (removeTurnstile){return 'true'}
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
+  if (removeTurnstile) { return 'true' }
   const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
   const secretKey = await KV.get('TurnstileKeys');
   const response = await fetch(verifyUrl, {
@@ -97,7 +96,7 @@ async function verifyTurnstile(responseToken) {
   return data.success;
 }
 async function usermatch(userName, usertype) {
-  const typeUsers = await KV.get(usertype)  || '';
+  const typeUsers = await KV.get(usertype) || '';
   const typeUsersArray = typeUsers.split(","); // 将返回的用户类型字符串分割成数组
   return typeUsersArray.includes(userName); // 检查用户名是否在类型用户数组中
 }
@@ -135,18 +134,18 @@ async function handleRequest(request) {
   const chatusername = await KV.get('ChatUserName') || 'ChatGPT';
   const chatmail = await KV.get('ChatMail') || 'chatgpt@openai.com';
   const apiKey = await KV.get('ModerationApiKey');
-   const cookies = request.headers.get('Cookie');
+  const cookies = request.headers.get('Cookie');
   let aian = '';
-if (cookies) {
-  const cookiesArray = cookies.split(';');
-  for (const cookie of cookiesArray) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'aian') {
-      aian = value;
-    } 
+  if (cookies) {
+    const cookiesArray = cookies.split(';');
+    for (const cookie of cookiesArray) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'aian') {
+        aian = value;
+      }
+    }
   }
-}
-  
+
   //处理直链登陆形式
   const params = new URLSearchParams(url.search);
   //const userName = params.get('usertoken');
@@ -154,10 +153,10 @@ if (cookies) {
   //    const accountNumber = params.get('an-custom') || params.get('an') || '1';
   //    return await handleLogin(userName, accountNumber, 'do not need Turnstle','');
   //}
-  
 
-  if (!admin){
-      return handleInitialRequest(request);
+
+  if (!admin) {
+    return handleInitialRequest(request);
   }
 
   if (url.pathname.startsWith('/admin')) {
@@ -180,15 +179,15 @@ if (cookies) {
     }
   }
 
-  if(url.pathname.startsWith('/export')){
+  if (url.pathname.startsWith('/export')) {
     if (request.method === 'GET') {
       return handleExportGetRequest(request);
-    }  else if (request.method === 'POST') {
+    } else if (request.method === 'POST') {
       return handleExportPostRequest(request);
-    }else {
+    } else {
       return new Response('Method not allowed', { status: 405 });
     }
-   }
+  }
   if (url.pathname.startsWith('/user')) {
     if (request.method === 'GET') {
       return handleUserGetRequest();
@@ -211,11 +210,11 @@ if (cookies) {
     }
   }
 
- if(url.pathname.startsWith('/usage')){
-  return handleUsageRequest(request)
- }
+  if (url.pathname.startsWith('/usage')) {
+    return handleUsageRequest(request)
+  }
 
- 
+
   // for oaifree
   if (url.pathname === '/auth/login_auth0') {
     if (request.method === 'GET') {
@@ -238,138 +237,139 @@ if (cookies) {
          return new Response('Method not allowed', { status: 200 });
        }
      } */
-     url.host = 'new.oaifree.com';
-     url.protocol = 'https';
-     return fetch(new Request(url, request));
-   }
+    url.host = 'new.oaifree.com';
+    url.protocol = 'https';
+    return fetch(new Request(url, request));
+  }
 
   if (apiKey) {
     if (url.pathname === "/backend-api/conversation") {
-        const requestBody = await request.json();
-        const userMessages = requestBody.messages
-            .filter(
-                (msg) =>
-                    msg.author.role === "user" && msg.content.content_type === "text"
-            )
-            .map((msg) => msg.content.parts.join(" "));
+      const requestBody = await request.json();
+      const userMessages = requestBody.messages
+        .filter(
+          (msg) =>
+            msg.author.role === "user" && msg.content.content_type === "text"
+        )
+        .map((msg) => msg.content.parts.join(" "));
 
-        if (userMessages.length > 0) {
-            const moderationResult = await checkContentForModeration(
-                userMessages,
-                apiKey
-            );
-            if (moderationResult.shouldBlock) {
-              const UserName = userMessages;
-              await deletelog(UserName,aian,'Message');
-              
-                return new Response(
-                    JSON.stringify({ detail: "此内容可能违反了我们的使用政策" }),
-                    {
-                        status: 451,
-                        headers: { "Content-Type": "application/json" },
-                    }
-                );
+      if (userMessages.length > 0) {
+        const moderationResult = await checkContentForModeration(
+          userMessages,
+          apiKey
+        );
+        if (moderationResult.shouldBlock) {
+          const UserName = userMessages;
+          await deletelog(UserName, aian, 'Message');
+
+          return new Response(
+            JSON.stringify({ detail: "此内容可能违反了我们的使用政策" }),
+            {
+              status: 451,
+              headers: { "Content-Type": "application/json" },
             }
+          );
         }
-        
-        url.host = "new.oaifree.com";
-        const newnewRequest = new Request(url, {
-            body: JSON.stringify(requestBody),
-            method: request.method,
-            headers: request.headers,
-        });
-        return fetch(newnewRequest);
-    }
-}
-  
-  //Voice地址和其他
- url.host = 'new.oaifree.com';
- const modifiedRequest = new Request(url, request);
- if(voiceURL){
- modifiedRequest.headers.set('X-Voice-Base', `https://${voiceURL}`);
- }
- const response = await fetch(modifiedRequest);
+      }
 
- //去掉小锁
- if (url.pathname === '/backend-api/conversations') {
-   const data = await response.json();
-   data.items = data.items.filter(item => item.title !== "🔒");
-   return new Response(JSON.stringify(data), {
-     status: response.status,
-     headers: response.headers
-   });
- }
- 
- //修改用户信息
- if (url.pathname === '/backend-api/me') {
-   const data = await response.json();
-   data.picture = `${chatlogourl}`;
-   data.email = `${chatmail}`;
-   data.name = `${chatusername} [${aian}]`;
-   return new Response(JSON.stringify(data), {
-     status: response.status,
-     headers: response.headers
-   });
- }
- if (url.pathname === '/backend-api/gizmo_creator_profile') {
-   const data = await response.json();
-   data.name = `${chatusername} [${aian}]`;
-   data.display_name = `${chatusername} [${aian}]`;
-   return new Response(JSON.stringify(data), {
-     status: response.status,
-     headers: response.headers
-   });
- }
-   return response;
+      url.host = "new.oaifree.com";
+      const newnewRequest = new Request(url, {
+        body: JSON.stringify(requestBody),
+        method: request.method,
+        headers: request.headers,
+      });
+      return fetch(newnewRequest);
+    }
+  }
+
+  //Voice地址和其他
+  url.host = 'new.oaifree.com';
+  const modifiedRequest = new Request(url, request);
+  if (voiceURL) {
+    modifiedRequest.headers.set('X-Voice-Base', `https://${voiceURL}`);
+  }
+  const response = await fetch(modifiedRequest);
+
+  //去掉小锁
+  if (url.pathname === '/backend-api/conversations') {
+    const data = await response.json();
+    data.items = data.items.filter(item => item.title !== "🔒");
+    return new Response(JSON.stringify(data), {
+      status: response.status,
+      headers: response.headers
+    });
+  }
+
+  //修改用户信息
+  if (url.pathname === '/backend-api/me') {
+    const data = await response.json();
+    data.picture = `${chatlogourl}`;
+    data.email = `${chatmail}`;
+    data.name = `${chatusername} [${aian}]`;
+    return new Response(JSON.stringify(data), {
+      status: response.status,
+      headers: response.headers
+    });
+  }
+  if (url.pathname === '/backend-api/gizmo_creator_profile') {
+    const data = await response.json();
+    data.name = `${chatusername} [${aian}]`;
+    data.display_name = `${chatusername} [${aian}]`;
+    return new Response(JSON.stringify(data), {
+      status: response.status,
+      headers: response.headers
+    });
+  }
+  return response;
 }
 
 
 //初始化信息填入功能
 async function handleInitialRequest(request) {
   const admin = await KV.get('Admin');
-if (!admin){
-  if (request.method === 'GET') {
-    return handleInitialGetRequest();
-  } else if (request.method === 'POST') {
-    return handleInitialPostRequest(request);
-  } else {
-    return new Response('Method not allowed', { status: 405 });
+  if (!admin) {
+    if (request.method === 'GET') {
+      return handleInitialGetRequest();
+    } else if (request.method === 'POST') {
+      return handleInitialPostRequest(request);
+    } else {
+      return new Response('Method not allowed', { status: 405 });
+    }
   }
-}
-else {return new Response('Already Have Admin', { status: 405 });
-}
+  else {
+    return new Response('Already Have Admin', { status: 405 });
+  }
 }
 
 async function handleInitialPostRequest(request) {
   const formData = await request.formData();
   const fields = [
-    'TurnstileKeys', 'TurnstileSiteKey', 'Users', 'VIPUsers', 'FreeUsers', 
-    'Admin', 'ForceAN', 'SetAN', 'PlusMode', 'FreeMode', 'WebName', 
-    'WorkerURL','VoiceURL', 'LogoURL', 'CDKEY', 'AutoDeleteCDK', 'FKDomain', 'Status',
-    'PlusAliveAccounts', 'FreeAliveAccounts', 'rt_1', 'rt_2', 'at_1', 'at_2', 'FreeURL', 'ChatUserName', 'ChatMail', 'ChatLogoURL', 'RemoveTurnstile','ModerationApiKey'
+    'TurnstileKeys', 'TurnstileSiteKey', 'Users', 'VIPUsers', 'FreeUsers',
+    'Admin', 'ForceAN', 'SetAN', 'PlusMode', 'FreeMode', 'WebName',
+    'WorkerURL', 'VoiceURL', 'LogoURL', 'CDKEY', 'AutoDeleteCDK', 'FKDomain', 'Status',
+    'PlusAliveAccounts', 'FreeAliveAccounts', 'rt_1', 'rt_2', 'at_1', 'at_2', 'FreeURL', 'ChatUserName', 'ChatMail', 'ChatLogoURL', 'RemoveTurnstile', 'ModerationApiKey'
   ];
 
   for (const field of fields) {
-        let value = formData.get(field);
-        if (value) { // 确保字段有值再保存
-            if (field === 'WorkerURL' && !value) {
-                value = (new URL(request.url)).hostname;
-            }
-            if (field === 'VoiceURL' && !value) {
-                let hostname = (new URL(request.url)).hostname;
-                let parts = hostname.split('.');
-                parts[0] = 'voice';
-                value = parts.join('.');
-            }
-            if (field === 'FreeURL' && !value) {
-                let hostname = (new URL(request.url)).hostname;
-                let parts = hostname.split('.');
-                parts[0] = 'free';
-                value = parts.join('.');
-            }
-            await KV.put(field, value); // 保存到KV存储
-        }
+    let value = formData.get(field);
+    if (value) { // 确保字段有值再保存
+      if (field === 'WorkerURL' && !value) {
+        value = (new URL(request.url)).hostname;
+      }
+      if (field === 'VoiceURL' && !value) {
+        let hostname = (new URL(request.url)).hostname;
+        let parts = hostname.split('.');
+        parts[0] = 'voice';
+        value = parts.join('.');
+      }
+      if (field === 'FreeURL' && !value) {
+        let hostname = (new URL(request.url)).hostname;
+        let parts = hostname.split('.');
+        parts[0] = 'free';
+        value = parts.join('.');
+      }
+      await KV.put(field, value); // 保存到KV存储
     }
+  }
 
   return new Response('Parameters updated successfully', { status: 200 });
 }
@@ -461,9 +461,9 @@ async function getInitialHTML() {
 
 function getInitialFieldsHTML() {
   const fields = [
-    { name: 'Admin', label: '【必填】管理员 (用于管理面板的验证使用，且可看所有聊天记录)' ,isrequired: 'required'},
-    { name: 'TurnstileKeys', label: '【必填】Turnstile密钥' ,isrequired: 'required'},
-    { name: 'TurnstileSiteKey', label: '【必填】Turnstile站点密钥' ,isrequired: 'required'},
+    { name: 'Admin', label: '【必填】管理员 (用于管理面板的验证使用，且可看所有聊天记录)', isrequired: 'required' },
+    { name: 'TurnstileKeys', label: '【必填】Turnstile密钥', isrequired: 'required' },
+    { name: 'TurnstileSiteKey', label: '【必填】Turnstile站点密钥', isrequired: 'required' },
     { name: 'Remove Turnstile', label: '【选填】有值则禁用Turnstile验证，以上两个参数随意' },
     { name: 'ModerationApiKey', label: '【选填】如需启用道德审查，则填入始皇oaipro的apikey' },
     { name: 'WorkerURL', label: '站点域名 (无需https://【选填，不填则自动储存worker的域名】' },
@@ -505,7 +505,7 @@ async function handlePlusPostRequest(request) {
   const adminuserName = formData.get('adminusername');
   const refreshToken = formData.get('refresh_token');
   const accountNumber = formData.get('account_number');
-  const accountUsers = formData.get('account_users'); 
+  const accountUsers = formData.get('account_users');
   const turnstileResponse = formData.get('cf-turnstile-response');
 
   // 验证 Turnstile 响应
@@ -547,7 +547,7 @@ async function handlePlusPostRequest(request) {
     const atKey = `at_${accountNumber}`;
     if (tokenData.access_token) {
       jsonAccessToken = tokenData.access_token;
-      jsonRefreshToken = tokenData.refresh_token ||'';
+      jsonRefreshToken = tokenData.refresh_token || '';
       await KV.put(atKey, jsonAccessToken);
       await KV.put(rtKey, jsonRefreshToken);
       await addToAliveAccountList(jsonAccessToken, accountNumber);
@@ -560,14 +560,14 @@ async function handlePlusPostRequest(request) {
       await addToAliveAccountList(jsonAccessToken, accountNumber);
       return generatePlusResponse(`account_number:\n${accountNumber}\n\nrefresh_token:\n${jsonRefreshToken}\n\naccess_token:\n${jsonAccessToken}`, adminuserName);
     }
- //   const result = await processToken(refreshToken, accountNumber, adminuserName);
- // return result;
+    //   const result = await processToken(refreshToken, accountNumber, adminuserName);
+    // return result;
 
   } catch (e) {
     // 输入不是 JSON 格式
   }
 
-  
+
 
   // 批量处理非 JSON 格式的 token
   if (!jsonAccessToken && refreshToken.includes(',')) {
@@ -712,7 +712,7 @@ async function generatePlusResponse(message, adminuserName) {
 async function getPlusHTML() {
   const WorkerURL = await KV.get('WorkerURL');
   const turnstileSiteKey = await KV.get('TurnstileSiteKey');
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -856,15 +856,16 @@ async function handleExportGetRequest(request) {
   }
   const adminusers = await KV.get('Admin') || '';
   if (adminusers.split(',').includes(adminUserName)) {
-  const validTokenTypes = ['rt', 'at'];
-  const validAccountTypes = ['Free', 'Plus'];
-  if (!validTokenTypes.includes(tokenType) || !validAccountTypes.includes(accountType)) {
-    return new Response('Invalid token or account type', { status: 400 });
+    const validTokenTypes = ['rt', 'at'];
+    const validAccountTypes = ['Free', 'Plus'];
+    if (!validTokenTypes.includes(tokenType) || !validAccountTypes.includes(accountType)) {
+      return new Response('Invalid token or account type', { status: 400 });
+    }
+    return await exportToken(tokenType, accountType);
   }
-  return await exportToken(tokenType, accountType);
-}
-else{return new Response('Unauthorized access', { status: 403 });
-}
+  else {
+    return new Response('Unauthorized access', { status: 403 });
+  }
 }
 
 async function exportToken(tokenType, accountType) {
@@ -930,31 +931,33 @@ async function handleExportPostRequest(request) {
 
   // 检查管理员密码是否正确
   if (adminusers.split(',').includes(adminPassword)) {
-   
-  if (operationType=='txt'){
-  // 验证 tokenType 和 accountType 是否有效
-  const validTokenTypes = ['rt', 'at'];
-  const validAccountTypes = ['Free', 'Plus'];
-  if (!validTokenTypes.includes(tokenType) || !validAccountTypes.includes(accountType)) {
-    return new Response('Invalid token or account type', { status: 400 });
+
+    if (operationType == 'txt') {
+      // 验证 tokenType 和 accountType 是否有效
+      const validTokenTypes = ['rt', 'at'];
+      const validAccountTypes = ['Free', 'Plus'];
+      if (!validTokenTypes.includes(tokenType) || !validAccountTypes.includes(accountType)) {
+        return new Response('Invalid token or account type', { status: 400 });
+      }
+
+      // 调用 exportToken 函数并返回结果
+      return await exportToken(tokenType, accountType);
+    }
+    else {
+      const WorkerURL = await KV.get('WorkerURL');
+      return new Response(`https://${WorkerURL}/export?admin=${adminPassword}&type=${accountType}&token=${tokenType}`, { status: 200 });
+    }
   }
 
-  // 调用 exportToken 函数并返回结果
-  return await exportToken(tokenType, accountType);}
-  else{
-    const WorkerURL=await KV.get('WorkerURL');
-    return new Response(`https://${WorkerURL}/export?admin=${adminPassword}&type=${accountType}&token=${tokenType}`, { status: 200 });
+  else {
+    return new Response('Unauthorized access', { status: 403 });
   }
-}
-
-else {return new Response('Unauthorized access', { status: 403 });
-}
 }
 
 
 async function getExportHTML() {
   const turnstileSiteKey = await KV.get('TurnstileSiteKey');
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -1108,7 +1111,7 @@ async function handleAdminPostRequest(request) {
     const forceCarValue = forceCar.toLowerCase() === 'yes' ? '1' : '0';
     await KV.put('ForceAN', forceCarValue);
   }
-  if (temporaryAccount) {   
+  if (temporaryAccount) {
     await KV.put('TemporaryAN', temporaryAccount);
   }
   return generateAdminResponse('Operation completed successfully');
@@ -1120,7 +1123,7 @@ async function handleAdminGetRequest() {
 }
 
 async function generateAdminResponse(message) {
- const errorHtml = `
+  const errorHtml = `
  <div class="ulp-field ulp-error">
    <div class="ulp-error-info">
      <span class="ulp-input-error-icon" role="img" aria-label="Error"></span>
@@ -1128,18 +1131,18 @@ async function generateAdminResponse(message) {
    </div>
  </div>
  `;
- const html = await getAdminHTML();
- const responseHtml = html.replace(
-   '<button type="submit">Submit</button>',
-   errorHtml + '<button type="submit">Submit</button>'
- );
- return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
+  const html = await getAdminHTML();
+  const responseHtml = html.replace(
+    '<button type="submit">Submit</button>',
+    errorHtml + '<button type="submit">Submit</button>'
+  );
+  return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
 }
 
 async function getAdminHTML() {
-  const WorkerURL=await KV.get('WorkerURL');
-  const turnstileSiteKey=await KV.get('TurnstileSiteKey');
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const WorkerURL = await KV.get('WorkerURL');
+  const turnstileSiteKey = await KV.get('TurnstileSiteKey');
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   return `
   <!DOCTYPE html>
 <html lang="en">
@@ -1308,20 +1311,20 @@ async function handleUserPostRequest(request) {
   const turnstileResponse = formData.get('cf-turnstile-response');
 
   const userRegex = new RegExp(`^${newUsers}_(\\d+)$`);
-    let fullUserName = newUsers; 
-     const defaultusers = await KV.get("Users")|| '';
-     const vipusers = await KV.get("VIPUsers")|| '';
-     const freeusers = await KV.get("FreeUsers")|| '';
-     const admin = await KV.get("Admin")|| '';
-     // 合并所有用户
-     const users = `${defaultusers},${vipusers},${freeusers},${admin}`;
-    // 自动查找匹配的用户名格式abc_xxx，并添加后缀
-    users.split(",").forEach(user => {
-      const match = user.match(userRegex);
-          if (match) {
-              fullUserName = user; // 更新为完整的用户名
-          }
-      });
+  let fullUserName = newUsers;
+  const defaultusers = await KV.get("Users") || '';
+  const vipusers = await KV.get("VIPUsers") || '';
+  const freeusers = await KV.get("FreeUsers") || '';
+  const admin = await KV.get("Admin") || '';
+  // 合并所有用户
+  const users = `${defaultusers},${vipusers},${freeusers},${admin}`;
+  // 自动查找匹配的用户名格式abc_xxx，并添加后缀
+  users.split(",").forEach(user => {
+    const match = user.match(userRegex);
+    if (match) {
+      fullUserName = user; // 更新为完整的用户名
+    }
+  });
 
   // Verify Turnstile response
   if (!turnstileResponse || !await verifyTurnstile(turnstileResponse)) {
@@ -1329,13 +1332,13 @@ async function handleUserPostRequest(request) {
   }
 
   if (newUsers && userType === 'query-limits') {
-    
-    const accountNumber = await getToCheckAccountNumber(fullUserName,'Plus');
+
+    const accountNumber = await getToCheckAccountNumber(fullUserName, 'Plus');
     const accessToken = await KV.get(`at_${accountNumber}`) || '1';
-    const shareToken = await getToCheckShareToken(fullUserName,accessToken);
-    const queryLimit = await handleQueryRequest(accessToken,shareToken);
+    const shareToken = await getToCheckShareToken(fullUserName, accessToken);
+    const queryLimit = await handleQueryRequest(accessToken, shareToken);
     return generateUserResponse(`User: ${fullUserName}, AN: ${accountNumber}, ${queryLimit}`);
-    }
+  }
 
   // Check if parameters are present
   if (!adminuserName || !newUsers || !userType) {
@@ -1350,20 +1353,20 @@ async function handleUserPostRequest(request) {
 
   // Handle user addition or deletion
   if (userType === 'delete') {
-   await deleteUsers(fullUserName);
-  const users = await KV.get('Users') || '';
-  const freeUsers = await KV.get('FreeUsers') || '';
-  const vipUsers = await KV.get('VIPUsers') || '';
-  return generateUserResponse(`User deleted successfully.\n\nusers:\n${users}\n\nfreeusers:\n${freeUsers}\n\nvipusers:\n${vipUsers}`);
-  } 
+    await deleteUsers(fullUserName);
+    const users = await KV.get('Users') || '';
+    const freeUsers = await KV.get('FreeUsers') || '';
+    const vipUsers = await KV.get('VIPUsers') || '';
+    return generateUserResponse(`User deleted successfully.\n\nusers:\n${users}\n\nfreeusers:\n${freeUsers}\n\nvipusers:\n${vipUsers}`);
+  }
   else {
     await addUsers(newUsers, userType);
-  
-  const users = await KV.get('Users') || '';
-  const freeUsers = await KV.get('FreeUsers') || '';
-  const vipUsers = await KV.get('VIPUsers') || '';
-  const WorkerURL=await KV.get('WorkerURL');
-  return generateUserResponse(`User Added successfully\n\nLogin link:\nhttps://${WorkerURL}/?user=${newUsers}\n\nusers:\n${users}\n\nfreeusers:\n${freeUsers}\n\nvipusers:\n${vipUsers}`);
+
+    const users = await KV.get('Users') || '';
+    const freeUsers = await KV.get('FreeUsers') || '';
+    const vipUsers = await KV.get('VIPUsers') || '';
+    const WorkerURL = await KV.get('WorkerURL');
+    return generateUserResponse(`User Added successfully\n\nLogin link:\nhttps://${WorkerURL}/?user=${newUsers}\n\nusers:\n${users}\n\nfreeusers:\n${freeUsers}\n\nvipusers:\n${vipUsers}`);
   }
 }
 
@@ -1391,75 +1394,75 @@ async function deleteUsers(usersToDelete) {
   //删除用户的历史sharetoken
   return await deleteShareToken(usersToDelete);
 }
-    
+
 async function deleteShareToken(userName) {
   const url = 'https://chat.oaifree.com/token/register';
   const passed = generatePassword(userName)
-  
-  const accountNumber = await getToCheckAccountNumber(userName,'Plus');
+
+  const accountNumber = await getToCheckAccountNumber(userName, 'Plus');
   const accessToken = await KV.get(`at_${accountNumber}`) || '1';
- /*  
-   const tokenPrefix = await KV.get('TokenPrefix');
-  const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号 */
+  /*  
+    const tokenPrefix = await KV.get('TokenPrefix');
+   const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号 */
 
   //console.log(`getShareToken - userName: ${userName}, accountNumber: ${accountNumber}, showConversations: ${isAdmin}, isTemporary: ${isTemporary}`);
   const body = new URLSearchParams({
-      access_token: accessToken,  // 使用从全局变量中获取的 accessToken
-      unique_name: passed, //前缀+无后缀用户名
-     // site_limit: '', // 限制的网站
-      expires_in: '-1', // token有效期（单位为秒），填 0 则永久有效
-     // gpt35_limit: '0', // gpt3.5 对话限制
-     // gpt4_limit: '0', // gpt4 对话限制，-1为不限制
-     // show_conversations: 'false', // 是否显示所有人的会话
-     // temporary_chat: 'false', //默认启用临时聊天
-     // show_userinfo: 'false', // 是否显示用户信息
-     // reset_limit: 'false' // 是否重置对话限制
+    access_token: accessToken,  // 使用从全局变量中获取的 accessToken
+    unique_name: passed, //前缀+无后缀用户名
+    // site_limit: '', // 限制的网站
+    expires_in: '-1', // token有效期（单位为秒），填 0 则永久有效
+    // gpt35_limit: '0', // gpt3.5 对话限制
+    // gpt4_limit: '0', // gpt4 对话限制，-1为不限制
+    // show_conversations: 'false', // 是否显示所有人的会话
+    // temporary_chat: 'false', //默认启用临时聊天
+    // show_userinfo: 'false', // 是否显示用户信息
+    // reset_limit: 'false' // 是否重置对话限制
   }).toString();
   await fetch(url, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: body
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: body
   });
   return 'Delete ST suceed.';
 }
 
-async function getToCheckShareToken(userName,accessToken) {
+async function getToCheckShareToken(userName, accessToken) {
   const url = 'https://chat.oaifree.com/token/register';
   const passed = generatePassword(userName)
- /*  
-   const tokenPrefix = await KV.get('TokenPrefix');
-  const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号 */
+  /*  
+    const tokenPrefix = await KV.get('TokenPrefix');
+   const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号 */
   //console.log(`getShareToken - userName: ${userName}, accountNumber: ${accountNumber}, showConversations: ${isAdmin}, isTemporary: ${isTemporary}`);
   const body = new URLSearchParams({
-      access_token: accessToken,  // 使用从全局变量中获取的 accessToken
-      unique_name: passed, //前缀+无后缀用户名
-      //site_limit: '', // 限制的网站
-      //expires_in: '0', // token有效期（单位为秒），填 0 则永久有效
-      //gpt35_limit: '-1', // gpt3.5 对话限制
-      //gpt4_limit: '-1', // gpt4 对话限制，-1为不限制
-      //show_conversations: 'false', // 是否显示所有人的会话
-      //temporary_chat: 'false', //默认启用临时聊天
-      //show_userinfo: 'false', // 是否显示用户信息
-      reset_limit: 'false' // 是否重置对话限制
-    }).toString();
-    const apiResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body
-    });
-    const responseText = await apiResponse.text();
-    const tokenKeyMatch = /"token_key":"([^"]+)"/.exec(responseText);
-    const tokenKey = tokenKeyMatch ? tokenKeyMatch[1] : 'Can not get share token.';
-    return tokenKey;
+    access_token: accessToken,  // 使用从全局变量中获取的 accessToken
+    unique_name: passed, //前缀+无后缀用户名
+    //site_limit: '', // 限制的网站
+    //expires_in: '0', // token有效期（单位为秒），填 0 则永久有效
+    //gpt35_limit: '-1', // gpt3.5 对话限制
+    //gpt4_limit: '-1', // gpt4 对话限制，-1为不限制
+    //show_conversations: 'false', // 是否显示所有人的会话
+    //temporary_chat: 'false', //默认启用临时聊天
+    //show_userinfo: 'false', // 是否显示用户信息
+    reset_limit: 'false' // 是否重置对话限制
+  }).toString();
+  const apiResponse = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: body
+  });
+  const responseText = await apiResponse.text();
+  const tokenKeyMatch = /"token_key":"([^"]+)"/.exec(responseText);
+  const tokenKey = tokenKeyMatch ? tokenKeyMatch[1] : 'Can not get share token.';
+  return tokenKey;
 }
 
 async function generateUserResponse(message) {
 
- const errorHtml = `
+  const errorHtml = `
  <div class="ulp-field ulp-error">
    <div class="ulp-error-info">
      <span class="ulp-input-error-icon" role="img" aria-label="Error"></span>
@@ -1467,12 +1470,12 @@ async function generateUserResponse(message) {
    </div>
  </div>
  `;
- const html = await getUserHTML();
- const responseHtml = html.replace(
-   '<button type="submit">Submit</button>',
-   errorHtml + '<button type="submit">Submit</button>'
- );
- return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
+  const html = await getUserHTML();
+  const responseHtml = html.replace(
+    '<button type="submit">Submit</button>',
+    errorHtml + '<button type="submit">Submit</button>'
+  );
+  return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
 }
 
 async function getToCheckAccountNumber(userName, antype) {
@@ -1547,8 +1550,8 @@ async function queryLimits(accessToken, shareToken) {
 
 
 async function getUserHTML() {
-  const turnstileSiteKey=await KV.get('TurnstileSiteKey');
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const turnstileSiteKey = await KV.get('TurnstileSiteKey');
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -1671,15 +1674,15 @@ if ('${removeTurnstile}') {
 
 
 async function verifyPassword(inputPassword, storedHash) {
-    const inputHash = await hashPassword(inputPassword);
-    return inputHash === storedHash;
+  const inputHash = await hashPassword(inputPassword);
+  return inputHash === storedHash;
 }
 
 async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hash = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 //Register功能
@@ -1730,22 +1733,22 @@ async function handleRegisterPostRequest(request) {
 async function registerlog(userName, cdkey) {
   const currentTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
   const logEntry = {
-      user: userName,
-      time: currentTime,
-      cdkey: cdkey
+    user: userName,
+    time: currentTime,
+    cdkey: cdkey
   };
   // Retrieve the existing log array or create a new one if it doesn't exist
   const lastDeleteLogs = await KV.get(`RegisterLogs`);
   let logArray = [];
   if (lastDeleteLogs) {
-      logArray = JSON.parse(lastDeleteLogs);
+    logArray = JSON.parse(lastDeleteLogs);
   }
   logArray.push(logEntry);
   await KV.put(`RegisterLogs`, JSON.stringify(logArray));
 }
 
 async function generateRegisterResponse(message) {
-   const errorHtml = `
+  const errorHtml = `
    <div class="ulp-field ulp-error">
      <div class="ulp-error-info">
        <span class="ulp-input-error-icon" role="img" aria-label="Error"></span>
@@ -1753,12 +1756,12 @@ async function generateRegisterResponse(message) {
      </div>
    </div>
    `;
-   const html = await getRegisterHTML();
-   const responseHtml = html.replace(
-     '<button class="continue-btn" type="button" id="continueBtn">Continue</button>',
-     errorHtml + '<button class="continue-btn" type="button" id="continueBtn">Continue</button>'
-   );
-   return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
+  const html = await getRegisterHTML();
+  const responseHtml = html.replace(
+    '<button class="continue-btn" type="button" id="continueBtn">Continue</button>',
+    errorHtml + '<button class="continue-btn" type="button" id="continueBtn">Continue</button>'
+  );
+  return new Response(responseHtml, { headers: { 'Content-Type': 'text/html' } });
 }
 
 async function getRegisterHTML() {
@@ -2328,8 +2331,8 @@ async function handleUsageRequest(request) {
       } else {
         const accountNumber = await getTableToCheckAccountNumber(adminUsername, queryType);
         const accessToken = await KV.get(`at_${accountNumber}`) || '1';
-        const shareToken = await getToCheckShareToken(adminUsername,accessToken);
-        const queryLimit = await handleQueryRequest(accessToken,shareToken);
+        const shareToken = await getToCheckShareToken(adminUsername, accessToken);
+        const queryLimit = await handleQueryRequest(accessToken, shareToken);
         return generateUsageResponse(`User: ${adminUsername}, AN: ${accountNumber}, ${queryLimit}`);
       }
     }
@@ -2377,15 +2380,15 @@ function parseUsage(usage) {
 
 async function getTableToCheckAccountNumber(userName, queryType) {
   const logs = queryType === 'plus' ? ['PlusLoginLogs'] : ['FreeLoginLogs'];
-    const lastLoginLogs = await KV.get(logs);
-    if (lastLoginLogs) {
-      const logArray = JSON.parse(lastLoginLogs);
-      const userLogs = logArray.filter(log => log.user === userName);
-      if (userLogs.length > 0) {
-        const lastAccount = userLogs[userLogs.length - 1].accountNumber;
-        return lastAccount;
-      }
+  const lastLoginLogs = await KV.get(logs);
+  if (lastLoginLogs) {
+    const logArray = JSON.parse(lastLoginLogs);
+    const userLogs = logArray.filter(log => log.user === userName);
+    if (userLogs.length > 0) {
+      const lastAccount = userLogs[userLogs.length - 1].accountNumber;
+      return lastAccount;
     }
+  }
   return 'Unknown';
 }
 
@@ -2401,7 +2404,7 @@ async function saveUsageLogs(usersData) {
 
 
 async function getTableUserHTML() {
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   const turnstileSiteKey = await KV.get('TurnstileSiteKey');
   return `
   <!DOCTYPE html>
@@ -2793,7 +2796,7 @@ async function handleLoginGetRequest(request) {
   const accountNumber = params.get('an-custom') || params.get('an') || '1';
 
   if (userName) {
-      return await handleLogin(userName, '', accountNumber, 'do not need Turnstile', '');
+    return await handleLogin(userName, '', accountNumber, 'do not need Turnstile', '');
   } else {
     const html = await getLoginHTML(setan);
     return new Response(html, { headers: { 'Content-Type': 'text/html' } });
@@ -2802,18 +2805,18 @@ async function handleLoginGetRequest(request) {
 
 
 async function handleLoginPostRequest(request) {
-    const formData = await request.formData();
-    const userName = formData.get('un');
-    const password = formData.get('pw');  // 获取密码
-    const anissues = formData.get('anissues') === 'on';
-    const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
-    const turnstileResponse = formData.get('cf-turnstile-response');
-    return await handleLogin(userName, password, accountNumber, turnstileResponse, anissues);
+  const formData = await request.formData();
+  const userName = formData.get('un');
+  const password = formData.get('pw');  // 获取密码
+  const anissues = formData.get('anissues') === 'on';
+  const accountNumber = formData.get('an-custom') || formData.get('an') || '1';
+  const turnstileResponse = formData.get('cf-turnstile-response');
+  return await handleLogin(userName, password, accountNumber, turnstileResponse, anissues);
 }
 
 function isTokenExpired(token) {
   // 检查 token 是否存在，如果不存在或为空字符串，直接返回 true
-  if (!token || token === "Bad_RT" ||token === "Bad_AT" ) {
+  if (!token || token === "Bad_RT" || token === "Bad_AT") {
     return true;
   }
   const payload = parseJwt(token);
@@ -2822,7 +2825,7 @@ function isTokenExpired(token) {
 }
 async function getOAuthLink(shareToken, proxiedDomain) {
   // const url = `https://${proxiedDomain}/api/auth/oauth_token`;
-   // 不知道为什么，好像没法直接通过反代的服务器获取oauth link
+  // 不知道为什么，好像没法直接通过反代的服务器获取oauth link
   const url = `https://new.oaifree.com/api/auth/oauth_token`;
   const response = await fetch(url, {
     method: 'POST',
@@ -2833,34 +2836,34 @@ async function getOAuthLink(shareToken, proxiedDomain) {
     body: JSON.stringify({
       share_token: shareToken
     })
- })
+  })
   const data = await response.json();
   return data.login_url;
 }
-async function getShareToken(userName, accessToken,accountNumber) {
+async function getShareToken(userName, accessToken, accountNumber) {
   const url = 'https://chat.oaifree.com/token/register';
- // const tokenPrefix = await KV.get('TokenPrefix');
- //const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号
+  // const tokenPrefix = await KV.get('TokenPrefix');
+  //const baseUserName = tokenPrefix + userName.replace(/_\d+$/, ''); // 移除用户名后的编号
 
- const isAdmin = await usermatch(userName, 'Admin') || userName=='atdirect';
- const isVIP = await usermatch(userName, 'VIPUsers') || await usermatch(userName, 'Admin') ;
+  const isAdmin = await usermatch(userName, 'Admin') || userName == 'atdirect';
+  const isVIP = await usermatch(userName, 'VIPUsers') || await usermatch(userName, 'Admin');
   const isFreeUsers = await usermatch(userName, 'FreeUsers');
   const isTemporary = await usermatch(accountNumber, 'TemporaryAN') && !isAdmin;
 
   const passwd = await generatePassword(userName);
 
- //console.log(`getShareToken - userName: ${userName}, accountNumber: ${accountNumber}, showConversations: ${isAdmin}, isVIP: ${isVIP}, isTemporary: ${isTemporary}, accessToken: ${accessToken}, passwd: ${passwd}`);
+  //console.log(`getShareToken - userName: ${userName}, accountNumber: ${accountNumber}, showConversations: ${isAdmin}, isVIP: ${isVIP}, isTemporary: ${isTemporary}, accessToken: ${accessToken}, passwd: ${passwd}`);
   const body = new URLSearchParams({
-     access_token: accessToken,  // 使用从全局变量中获取的 accessToken
-     unique_name: passwd, //前缀+无后缀用户名
-     site_limit: '', // 限制的网站
-     expires_in: isVIP ? '0' : '86400', // token有效期（单位为秒），填 0 则永久有效
-     gpt35_limit: '-1', // gpt3.5 对话限制
-     gpt4_limit: isFreeUsers ? '30' : '-1', // gpt4 对话限制，-1为不限制
-     show_conversations: isAdmin ? 'true' : 'false', // 是否显示所有人的会话
-     temporary_chat: isTemporary ? 'true' : 'false', //默认启用临时聊天
-     show_userinfo: isAdmin ? 'true' : 'false',  // 是否显示用户信息
-     reset_limit: 'false' // 是否重置对话限制
+    access_token: accessToken,  // 使用从全局变量中获取的 accessToken
+    unique_name: passwd, //前缀+无后缀用户名
+    site_limit: '', // 限制的网站
+    expires_in: isVIP ? '0' : '86400', // token有效期（单位为秒），填 0 则永久有效
+    gpt35_limit: '-1', // gpt3.5 对话限制
+    gpt4_limit: isFreeUsers ? '30' : '-1', // gpt4 对话限制，-1为不限制
+    show_conversations: isAdmin ? 'true' : 'false', // 是否显示所有人的会话
+    temporary_chat: isTemporary ? 'true' : 'false', //默认启用临时聊天
+    show_userinfo: isAdmin ? 'true' : 'false',  // 是否显示用户信息
+    reset_limit: 'false' // 是否重置对话限制
   }).toString();
   const apiResponse = await fetch(url, {
     method: 'POST',
@@ -2877,30 +2880,30 @@ async function getShareToken(userName, accessToken,accountNumber) {
 
 
 async function handleLogin(userName, password, initialaccountNumber, turnstileResponse, anissues) {
-    // Turnsile认证
-    if (turnstileResponse !== 'do not need Turnstile' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
-        return generateLoginResponse('Turnstile verification failed');
-    }
+  // Turnsile认证
+  if (turnstileResponse !== 'do not need Turnstile' && (!turnstileResponse || !await verifyTurnstile(turnstileResponse))) {
+    return generateLoginResponse('Turnstile verification failed');
+  }
 
-    // 初始化 credentials 变量
-    const credentials = await KV.get('UserCredentials');
-    const credentialsList = credentials ? JSON.parse(credentials) : {};
-    const hashedPassword = credentialsList[userName];
+  // 初始化 credentials 变量
+  const credentials = await KV.get('UserCredentials');
+  const credentialsList = credentials ? JSON.parse(credentials) : {};
+  const hashedPassword = credentialsList[userName];
 
-    if (!hashedPassword || !(await verifyPassword(password, hashedPassword))) {
-        await loginlog(userName, 'Bad_PW', 'Error');
-        return generateLoginResponse('Invalid username or password.');
-    }
+  if (!hashedPassword || !(await verifyPassword(password, hashedPassword))) {
+    await loginlog(userName, 'Bad_PW', 'Error');
+    return generateLoginResponse('Invalid username or password.');
+  }
 
-    const proxiedDomain = await KV.get('WorkerURL');
-    const status = await KV.get('Status');
-    const GPTState = await getGPTStatus();
-if ((GPTState == 'major_performance')&&(!status)){
-  await loginlog(userName, 'Bad_OAIStatus','Error');
-        return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
-    }
+  const proxiedDomain = await KV.get('WorkerURL');
+  const status = await KV.get('Status');
+  const GPTState = await getGPTStatus();
+  if ((GPTState == 'major_performance') && (!status)) {
+    await loginlog(userName, 'Bad_OAIStatus', 'Error');
+    return generateLoginResponse(`OpenAI service is under maintenance.<br>Official status: ${GPTState} <br>More details: https://status.openai.com`);
+  }
 
- //先尝试json
+  //先尝试json
   try {
     const tokenData = JSON.parse(userName);
     if (tokenData.accessToken) {
@@ -2913,10 +2916,10 @@ if ((GPTState == 'major_performance')&&(!status)){
       return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
     }
   } catch (e) {
-     // 输入不是 JSON 格式
+    // 输入不是 JSON 格式
   }
 
-// 如果输入用户名长度大于50，直接视作accessToken
+  // 如果输入用户名长度大于50，直接视作accessToken
   if (userName.length > 50) {
     const shareToken = await getShareToken('atdirect', userName, '0');
 
@@ -2928,7 +2931,7 @@ if ((GPTState == 'major_performance')&&(!status)){
   }
 
 
-// 如果输入用户名fk开头，直接视作sharetoken
+  // 如果输入用户名fk开头，直接视作sharetoken
   if (userName.startsWith('fk-')) {
     const shareToken = userName;
     return Response.redirect(await getOAuthLink(shareToken, proxiedDomain), 302);
@@ -2939,74 +2942,74 @@ if ((GPTState == 'major_performance')&&(!status)){
   let foundSuffix = false;
   let suffix = '';
   const forcean = await KV.get("ForceAN");
-  const defaultusers = await KV.get("Users")|| '';
-  const vipusers = await KV.get("VIPUsers")|| '';
-  const freeusers = await KV.get("FreeUsers")|| '';
-  const admin = await KV.get("Admin")|| '';
+  const defaultusers = await KV.get("Users") || '';
+  const vipusers = await KV.get("VIPUsers") || '';
+  const freeusers = await KV.get("FreeUsers") || '';
+  const admin = await KV.get("Admin") || '';
   // 合并所有用户
   const users = `${defaultusers},${vipusers},${freeusers},${admin}`;
 
 
- // 自动查找匹配的用户名格式abc_xxx，并添加后缀
+  // 自动查找匹配的用户名格式abc_xxx，并添加后缀
   users.split(",").forEach(user => {
     const match = user.match(userRegex);
     if (match) {
       foundSuffix = true;
-           suffix = match[1];  // 更新后缀为实际的账号编号
-           fullUserName = user; // 更新为完整的用户名
+      suffix = match[1];  // 更新后缀为实际的账号编号
+      fullUserName = user; // 更新为完整的用户名
     }
   });
 
   if (!foundSuffix && !users.split(",").includes(userName)) {
-   await loginlog(userName, 'Bad_PW','Error');
+    await loginlog(userName, 'Bad_PW', 'Error');
     return generateLoginResponse('Unauthorized access.');
   }
 
-  
- //用户权限判断，仅在users库内的用户可使用所有车(前置已判断，不过也不用删)
+
+  //用户权限判断，仅在users库内的用户可使用所有车(前置已判断，不过也不用删)
   if (!users.split(",").includes(fullUserName)) {
-     await loginlog(userName, 'Bad_PW','Error');
+    await loginlog(userName, 'Bad_PW', 'Error');
     return generateLoginResponse('Unauthorized access.');
   }
- //禁止免费用户使用序号大于99的vip私享车
-// if (freeusers.split(",").includes(fullUserName) && accountNumber > 99) {
-//     return new Response('Unauthorized access, you are vip users.', { status: 200 });
-// }
- //禁止付费用户使用序号小于99的免费车
- //if (vipusers.split(",").includes(fullUserName) && accountNumber < 100) {
- //    return new Response('Unauthorized access, please switch accounts.', { status: 200 });
- //}
+  //禁止免费用户使用序号大于99的vip私享车
+  // if (freeusers.split(",").includes(fullUserName) && accountNumber > 99) {
+  //     return new Response('Unauthorized access, you are vip users.', { status: 200 });
+  // }
+  //禁止付费用户使用序号小于99的免费车
+  //if (vipusers.split(",").includes(fullUserName) && accountNumber < 100) {
+  //    return new Response('Unauthorized access, please switch accounts.', { status: 200 });
+  //}
 
 
- //此处决定an
+  //此处决定an
   const setan = await KV.get('SetAN');
   let antype = 'Plus';
   let mode = '';
   let accountNumber = '';
 
-   // 如果 forcean 为 1，忽略用户输入的 accountNumber，使用后缀作为 accountNumber
+  // 如果 forcean 为 1，忽略用户输入的 accountNumber，使用后缀作为 accountNumber
   if (foundSuffix && forcean === '1') {
- accountNumber = await getAccountNumber(fullUserName,suffix, antype, 'Check',anissues);
+    accountNumber = await getAccountNumber(fullUserName, suffix, antype, 'Check', anissues);
   } else {
     if (setan == 'True') {
-  const plusmode = await KV.get('PlusMode'); //Random/Order
-  const freemode = await KV.get('FreeMode'); //Plus/Random/Order
+      const plusmode = await KV.get('PlusMode'); //Random/Order
+      const freemode = await KV.get('FreeMode'); //Plus/Random/Order
       antype = 'Plus';
       mode = plusmode;
- if (freemode !=='Plus'){
-    if (freeusers.split(",").includes(fullUserName) ){
+      if (freemode !== 'Plus') {
+        if (freeusers.split(",").includes(fullUserName)) {
           antype = 'Free';
           mode = freemode;
         }
       }
- 
-accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, mode,anissues);
-}
-else if (setan)  {
- accountNumber = await getAccountNumber(fullUserName,setan, antype, 'Check',anissues);
-}
-else {
-accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype, 'Check',anissues);
+
+      accountNumber = await getAccountNumber(fullUserName, initialaccountNumber, antype, mode, anissues);
+    }
+    else if (setan) {
+      accountNumber = await getAccountNumber(fullUserName, setan, antype, 'Check', anissues);
+    }
+    else {
+      accountNumber = await getAccountNumber(fullUserName, initialaccountNumber, antype, 'Check', anissues);
     }
   }
 
@@ -3015,19 +3018,20 @@ accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype
   const accessTokenKey = `at_${accountNumber}`;
   const accessToken = await KV.get(accessTokenKey);
 
- //使用佬友的sharetoken
- if (accessToken){
+  //使用佬友的sharetoken
+  if (accessToken) {
     if (accessToken.startsWith('fk-')) {
-   const fkDomain = await KV.get('FKDomain') ||proxiedDomain;
-   //return Response.redirect(await getOAuthLink(accessToken, fkDomain), 302);
-   return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`)
- }}
+      const fkDomain = await KV.get('FKDomain') || proxiedDomain;
+      //return Response.redirect(await getOAuthLink(accessToken, fkDomain), 302);
+      return Response.redirect(`https://${fkDomain}/auth/login_share?token=${accessToken}`)
+    }
+  }
 
   if (isTokenExpired(accessToken)) {
-      // 给没有refresh token的萌新用（比如我），取消下面这行注释即可享用
-     // return generateLoginResponse('The current access token has not been updated.', false);
-      
-      // 如果 Token 过期，执行获取新 Token 的逻辑
+    // 给没有refresh token的萌新用（比如我），取消下面这行注释即可享用
+    // return generateLoginResponse('The current access token has not been updated.', false);
+
+    // 如果 Token 过期，执行获取新 Token 的逻辑
     const url = 'https://token.oaifree.com/api/auth/refresh';
     const refreshToken = await KV.get(refreshTokenKey);
     if (refreshToken) {
@@ -3041,46 +3045,46 @@ accountNumber = await getAccountNumber(fullUserName,initialaccountNumber, antype
         body: `refresh_token=${refreshToken}`
       });
 
-     // 检查响应状态
+      // 检查响应状态
       if (response.ok) {
         const data = await response.json();
         const newAccessToken = data.access_token;
         await KV.put(accessTokenKey, newAccessToken);
       } else {
         await KV.put(accessTokenKey, "Bad_RT");
-         await loginlog(fullUserName, `Bad RT_${accountNumber}`,'Error');
+        await loginlog(fullUserName, `Bad RT_${accountNumber}`, 'Error');
         return generateLoginResponse('Error fetching access token.');
       }
- } 
- else {
+    }
+    else {
       return generateLoginResponse('The current access token has not been updated.');
     }
   }
   const finalaccessToken = await KV.get(accessTokenKey);
- const shareToken = await getShareToken(fullUserName, finalaccessToken,accountNumber);
+  const shareToken = await getShareToken(fullUserName, finalaccessToken, accountNumber);
 
 
-    if (shareToken === 'Can not get share token.') {
-     //await KV.put(accessTokenKey, "Bad_AT");
-     await loginlog(fullUserName, `Bad AT_${accountNumber}`,'Error');
-        return generateLoginResponse('Error fetching share token.');
-    }
+  if (shareToken === 'Can not get share token.') {
+    //await KV.put(accessTokenKey, "Bad_AT");
+    await loginlog(fullUserName, `Bad AT_${accountNumber}`, 'Error');
+    return generateLoginResponse('Error fetching share token.');
+  }
 
 
-    // Log the successful login
+  // Log the successful login
   await loginlog(fullUserName, accountNumber, antype);
 
-    const oauthLink = await getOAuthLink(shareToken, proxiedDomain);
-    const headers = new Headers();
-    headers.append('Location', oauthLink);
-    headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
-     
+  const oauthLink = await getOAuthLink(shareToken, proxiedDomain);
+  const headers = new Headers();
+  headers.append('Location', oauthLink);
+  headers.append('Set-Cookie', `aian=${accountNumber}; Path=/`);
 
-    const response = new Response(null, {
-        status: 302,
-        headers: headers
-    });
-    return response;
+
+  const response = new Response(null, {
+    status: 302,
+    headers: headers
+  });
+  return response;
 }
 
 async function loginlog(userName, accountNumber, antype) {
@@ -3092,7 +3096,7 @@ async function loginlog(userName, accountNumber, antype) {
     time: currentTime,
     timestamp: timestamp
   };
- // Retrieve the existing log array or create a new one if it doesn't exist
+  // Retrieve the existing log array or create a new one if it doesn't exist
   const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
   let logArray = [];
   if (lastLoginLogs) {
@@ -3102,14 +3106,14 @@ async function loginlog(userName, accountNumber, antype) {
   await KV.put(`${antype}LoginLogs`, JSON.stringify(logArray));
 }
 
-async function deletelog(userName, accountNumber,antype) {
+async function deletelog(userName, accountNumber, antype) {
   const currentTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
   const logEntry = {
     user: userName,
     time: currentTime,
     accountNumber: accountNumber
   };
- // Retrieve the existing log array or create a new one if it doesn't exist
+  // Retrieve the existing log array or create a new one if it doesn't exist
   const lastDeleteLogs = await KV.get(`${antype}DeleteLogs`);
   let logArray = [];
   if (lastDeleteLogs) {
@@ -3121,11 +3125,11 @@ async function deletelog(userName, accountNumber,antype) {
 
 //AN获取和删除
 async function getAccountNumber(userName, initialaccountNumber, antype, mode, anissues) {
- const currentTime = Date.now()
+  const currentTime = Date.now()
   const Milliseconds = 3 * 60 * 1000;
 
   const checkAndRemoveIssueAccount = async (accountNumber) => {
-   // Retrieve the login logs
+    // Retrieve the login logs
     const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
     if (lastLoginLogs) {
       const logArray = JSON.parse(lastLoginLogs);
@@ -3136,12 +3140,12 @@ async function getAccountNumber(userName, initialaccountNumber, antype, mode, an
           return currentTime - logTime <= Milliseconds;
         });
         if (recentLogins.length >= 1 && anissues) {
-         // 删除问题账号
+          // 删除问题账号
           const aliveAccount = await KV.get(`${antype}AliveAccounts`);
           let aliveAccountList = aliveAccount.split(',');
           aliveAccountList = aliveAccountList.filter(acc => acc !== accountNumber.toString());
           await KV.put(`${antype}AliveAccounts`, aliveAccountList.join(','));
-         await deletelog(userName, accountNumber,antype);
+          await deletelog(userName, accountNumber, antype);
           return true;
         }
       }
@@ -3149,7 +3153,7 @@ async function getAccountNumber(userName, initialaccountNumber, antype, mode, an
     return false;
   };
 
- // 顺序读取
+  // 顺序读取
   if (mode == 'Order') {
     const aliveAccountString = await KV.get(`${antype}AliveAccounts`) || '';
     let aliveAccounts = aliveAccountString
@@ -3168,15 +3172,15 @@ async function getAccountNumber(userName, initialaccountNumber, antype, mode, an
     return 1;
   }
 
- // 检测和删除问题账号
+  // 检测和删除问题账号
   if (mode == 'Check') {
     await checkAndRemoveIssueAccount(initialaccountNumber);
     return initialaccountNumber;
   }
 
- // 随机读取
+  // 随机读取
   if (mode == 'Random') {
-   // Retrieve the last login logs
+    // Retrieve the last login logs
     const lastLoginLogs = await KV.get(`${antype}LoginLogs`);
     if (lastLoginLogs) {
       const logArray = JSON.parse(lastLoginLogs);
@@ -3260,11 +3264,11 @@ async function getAliveAccountOptions() {
   return aliveAccounts.map(num => `<option value="${num}">${num}</option>`).join('');
 }
 
- async function getGPTStatus(){
+async function getGPTStatus() {
   const url = 'https://status.openai.com/api/v2/summary.json';
 
 
-   // 发送 POST 请求
+  // 发送 POST 请求
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -3275,19 +3279,19 @@ async function getAliveAccountOptions() {
   if (response.ok) {
     const data = await response.json();
     const status = data.components.find((component) => component.name === 'ChatGPT');
-      //return JSON.stringify(status);
+    //return JSON.stringify(status);
     return status.status;
   }
- else {return 'operational';}
+  else { return 'operational'; }
 }
 
 
 async function getLoginHTML(setan) {
-  const WorkerURL=await KV.get('WorkerURL');
-  const turnstileSiteKey=await KV.get('TurnstileSiteKey');
+  const WorkerURL = await KV.get('WorkerURL');
+  const turnstileSiteKey = await KV.get('TurnstileSiteKey');
   const websiteName = await KV.get('WebName') || 'Haibara AI';
   const logourl = await KV.get('LogoURL') || logo;
-  const removeTurnstile = await KV.get('RemoveTurnstile')||'';
+  const removeTurnstile = await KV.get('RemoveTurnstile') || '';
   const commonHTML = `
     <!DOCTYPE html>
     <html lang="en">
