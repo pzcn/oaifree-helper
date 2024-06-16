@@ -1818,7 +1818,7 @@ async function getRegisterHTML() {
           }
   
           .title-wrapper {
-              padding: 0 40px 24px;
+              padding: 40px 40px 24px;
               box-sizing: content-box;
               text-align: center;
           }
@@ -1828,6 +1828,7 @@ async function getRegisterHTML() {
               margin: 0;
               color: #2d333a;
               width: 320px;
+              margin: 24px 0 0;
           }
   
           .input-wrapper {
@@ -3338,7 +3339,7 @@ async function getLoginHTML(setan) {
             }
 
             .title-wrapper {
-                padding: 0 40px 24px;
+                padding: 40px 40px 24px;
                 box-sizing: content-box;
                 text-align: center;
             }
@@ -3348,6 +3349,7 @@ async function getLoginHTML(setan) {
                 margin: 0;
                 color: #2d333a;
                 width: 320px;
+                margin: 24px 0 0;
             }
 
             .input-wrapper {
