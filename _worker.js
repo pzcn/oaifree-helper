@@ -319,6 +319,18 @@ async function handleRequest(request) {
       headers: response.headers
     });
   }
+  if (url.pathname === '/backend-api/accounts/check') {
+    const data = await response.json();
+    for (const accountId in data.accounts) {
+      if (data.accounts[accountId].account) {
+        data.accounts[accountId].account.name = `${chatusername} [${aian}]`;
+      }
+    }
+    return new Response(JSON.stringify(data), {
+      status: response.status,
+      headers: response.headers
+    });
+  }
   return response;
 }
 
@@ -2740,50 +2752,6 @@ async function getHistoryData(queryType) {
   const historyLogs = await KV.get(logType);
   return historyLogs ? JSON.parse(historyLogs) : [];
 }
-
-
-function combineData(usersData, historyData) {
-  let combinedData = [];
-  let allUsers = new Set(usersData.map(u => u.user).concat(historyData.flatMap(h => h.usersData.map(u => u.user))));
-
-  allUsers.forEach(user => {
-    let historyUsage = historyData.map(h => {
-      let userUsage = h.usersData.find(u => u.user === user);
-      return userUsage ? { gpt4: userUsage.gpt4, gpt35: userUsage.gpt35 } : { gpt4: '', gpt35: '' };
-    });
-    let realTimeUsage = usersData.find(u => u.user === user);
-    combinedData.push({
-      user,
-      historyUsage,
-      realTimeUsage: realTimeUsage ? { gpt4: realTimeUsage.gpt4, gpt35: realTimeUsage.gpt35 } : { gpt4: '', gpt35: '' }
-    });
-  });
-
-  return combinedData;
-}
-
-function generateHeaderRow(historyData) {
-  return historyData.map(h => `<th>GPT-4</th><th>GPT-3.5</th>`).join('');
-}
-
-function generateTimestampRow(historyData) {
-  return historyData.map(h => `<th colspan="2">${h.timestamp}</th>`).join('');
-}
-
-async function getHistoryData(queryType) {
-  const logType = queryType === 'plus' ? 'PlusUsageLogs' : 'FreeUsageLogs';
-  const historyLogs = await KV.get(logType);
-  return historyLogs ? JSON.parse(historyLogs) : [];
-}
-
-
-
-
-
-
-
-
-
 
 
 
